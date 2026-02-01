@@ -2,7 +2,7 @@
   "name": "url-shortner",
   "version": "1.0.0",
   "description": "",
-  
+  "main": "server.js",
   "scripts": {
     "dev": "node --watch ./backend/server.js",
     "start": "node ./backend/server.js"
