@@ -1,0 +1,1 @@
+"Short code already exists.....Please try something else"
