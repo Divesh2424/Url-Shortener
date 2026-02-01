@@ -3,7 +3,7 @@ import chalk from "chalk";
 import { readFile, writeFile } from "fs/promises";
 import crypto from "crypto";
 
-const filePath = "links.json";
+const filePath = "./backend/links.json";
 
 //serving files to server
 const serveFileToServer = async (filename, res, content_type) => {
@@ -14,7 +14,7 @@ const serveFileToServer = async (filename, res, content_type) => {
   } catch (error) {
     res.writeHead(500, { "Content-Type": "text/plain" });
     res.end("Error reading file");
-    console.log(`Error during reading files : ${err.message}`);
+    console.log(`Error during reading files : ${error.message}`);
   }
 };
 
@@ -39,15 +39,15 @@ const server = http.createServer(async (req, res) => {
   
   if (req.method === "GET") {
     if (req.url === "/") {
-      return serveFileToServer("index.html", res, "text/html");
+      return serveFileToServer("frontend/index.html", res, "text/html");
     }
     
-    else if (req.url === "/style.css") {
-      return serveFileToServer("style.css", res, "text/css");
+    else if (req.url === "/css/style.css") {
+      return serveFileToServer("frontend/css/style.css", res, "text/css");
     }
     
-    else if (req.url === "/script.js") {
-      return serveFileToServer("script.js", res, "text/javascript");
+    else if (req.url === "/js/script.js") {
+      return serveFileToServer("frontend/js/script.js", res, "text/javascript");
     }
     
     else if (req.url === "/links") {
@@ -80,7 +80,7 @@ const server = http.createServer(async (req, res) => {
 
       if (!url) {
         res.writeHead(400, { "Content-Type": "text/plain" });
-        res.end("URL not found");
+        return res.end("URL not found");
       }
 
       const finalShortUrl = shortUrl || crypto.randomBytes(5).toString("hex");
