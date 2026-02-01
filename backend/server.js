@@ -100,7 +100,8 @@ const server = http.createServer(async (req, res) => {
     });
   }
 });
+const port = process.env.port || 3000;
 
-server.listen(3000, () => {
-  console.log(chalk.green("🔥 Listening on port : 3000"));
+server.listen(port, () => {
+  console.log(chalk.green(`🔥 Listening on port : ${port}`));
 });
