@@ -1,0 +1,65 @@
+{
+  "version": "5",
+  "dialect": "mysql",
+  "id": "d08b8596-85fb-4835-8c5f-b1932f1538f2",
+  "prevId": "83cc66ea-d41e-4f47-bda7-c829430a6d61",
+  "tables": {
+    "short_link": {
+      "name": "short_link",
+      "columns": {
+        "id": {
+          "name": "id",
+          "type": "int",
+          "primaryKey": false,
+          "notNull": true,
+          "autoincrement": true
+        },
+        "url": {
+          "name": "url",
+          "type": "varchar(255)",
+          "primaryKey": false,
+          "notNull": true,
+          "autoincrement": false
+        },
+        "short_code": {
+          "name": "short_code",
+          "type": "varchar(25)",
+          "primaryKey": false,
+          "notNull": true,
+          "autoincrement": false
+        }
+      },
+      "indexes": {},
+      "foreignKeys": {},
+      "compositePrimaryKeys": {
+        "short_link_id": {
+          "name": "short_link_id",
+          "columns": [
+            "id"
+          ]
+        }
+      },
+      "uniqueConstraints": {
+        "short_link_short_code_unique": {
+          "name": "short_link_short_code_unique",
+          "columns": [
+            "short_code"
+          ]
+        }
+      },
+      "checkConstraint": {}
+    }
+  },
+  "views": {},
+  "_meta": {
+    "schemas": {},
+    "tables": {
+      "\"users_table\"": "\"short_link\""
+    },
+    "columns": {}
+  },
+  "internal": {
+    "tables": {},
+    "indexes": {}
+  }
+}

@@ -4,12 +4,12 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>URL Shortener</title>
-    <link rel="stylesheet" href="css/style.css">
+    <link rel="stylesheet" href="style.css">
 </head>
 <body>
     <div class="container">
         <h1>URL Shortener</h1>
-        <form id="form-data">
+        <form action="/" method="post">
             <label for="enterurl">Enter URL : </label>
             <input type="url" name="enterurl" id="enterurl" required> 
             <label for="shorturl">Custom Short URL (Optional) : </label>
@@ -17,8 +17,16 @@
             <button type="submit" id="submitbtn">Shorten</button>
         </form>
         <h2>Shortened URLs</h2>
-        <ul id="shortened-urls"></ul>
+        <ul>
+  <% links.forEach((item) => { %>
+    <li>
+      <a href="/<%= item.shortCode %>" target="_blank">
+        <%= host %>/<%= item.shortCode %>
+      </a>
+      -> <%= item.url %>
+    </li>
+  <% }) %>
+</ul>
     </div>
-    <script src="js/script.js"></script>
 </body>
 </html>
