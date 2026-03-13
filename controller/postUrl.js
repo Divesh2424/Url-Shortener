@@ -1,6 +1,6 @@
 import crypto from "crypto";
 import { loadLinks, saveLinks, getLinkByShortCode } from "../services/shortener.services.js";
-import { url } from "inspector";
+// import { url } from "inspector";
 
 export const postUrlShortener = async (req, res) => {
   try {
@@ -27,9 +27,17 @@ export const postUrlShortener = async (req, res) => {
 export const getShortnerPage = async (req, res) => {
   try {
     const links = await loadLinks();
+
+    // let isLoggedIn = req.headers.cookie;
+    // isLoggedIn = Boolean(isLoggedIn?.split("=")[1]);
+    // console.log(typeof isLoggedIn);
+
+    let isLoggedIn = req.cookies.isLoggedIn;
+
     return res.render("index", {
       links,
       host: req.headers.host,
+      isLoggedIn
     });
   } catch (error) {
     console.log(error.message);
