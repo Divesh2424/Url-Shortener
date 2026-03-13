@@ -28,16 +28,9 @@ export const getShortnerPage = async (req, res) => {
   try {
     const links = await loadLinks();
 
-    // let isLoggedIn = req.headers.cookie;
-    // isLoggedIn = Boolean(isLoggedIn?.split("=")[1]);
-    // console.log(typeof isLoggedIn);
-
-    let isLoggedIn = req.cookies.isLoggedIn;
-
     return res.render("index", {
       links,
-      host: req.headers.host,
-      isLoggedIn
+      host: req.headers.host
     });
   } catch (error) {
     console.log(error.message);

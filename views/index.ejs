@@ -4,35 +4,75 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>URL Shortener</title>
-    <link rel="stylesheet" href="style.css">
+    <link rel="stylesheet" href="/style.css">
 </head>
+
 <body>
-  <%- include('header') %>
-  <div class="container">
-    <% if(isLoggedIn) { %>
-      <h2>You are Logged in </h2>
+
+<%- include('header') %>
+
+<div class="main-wrapper">
+
+  <div class="shortener-card">
+
+    <% if(user) { %>
+      <p class="status success">You are Logged in</p>
     <% } else { %>
-      <h2>You are not logged in</h2>
-      <% } %>
-        <h1>URL Shortener</h1>
-        <form action="/" method="post">
-            <label for="enterurl">Enter URL : </label>
-            <input type="url" name="enterurl" id="enterurl" required> 
-            <label for="shorturl">Custom Short URL (Optional) : </label>
-            <input type="text" name="shorturl" id="shorturl">
-            <button type="submit" id="submitbtn">Shorten</button>
-        </form>
-        <h2>Shortened URLs</h2>
-        <ul>
-  <% links.forEach((item) => { %>
-    <li>
-      <a href="/<%= item.shortCode %>" target="_blank">
-        <%= host %>/<%= item.shortCode %>
-      </a>
-      -> <%= item.url %>
-    </li>
-  <% }) %>
-</ul>
-    </div>
+      <p class="status warning">You are not logged in</p>
+    <% } %>
+
+    <h1 class="page-title">URL Shortener</h1>
+
+    <form action="/" method="post" class="shortener-form">
+
+        <div class="input-group">
+            <label for="enterurl">Enter URL</label>
+            <input type="url" name="enterurl" id="enterurl" placeholder="https://example.com" required>
+        </div>
+
+        <div class="input-group">
+            <label for="shorturl">Custom Short URL (Optional)</label>
+            <input type="text" name="shorturl" id="shorturl" placeholder="custom-name">
+        </div>
+
+        <button type="submit" id="submitbtn" class="primary-btn">
+            Shorten URL
+        </button>
+
+    </form>
+
+  </div>
+
+
+  <div class="links-card">
+
+    <h2 class="links-title">Shortened URLs</h2>
+
+    <ul class="links-list">
+
+      <% links.forEach((item) => { %>
+
+        <li class="link-item">
+
+          <div class="short-link">
+            <a href="/<%= item.shortCode %>" target="_blank">
+              <%= host %>/<%= item.shortCode %>
+            </a>
+          </div>
+
+          <div class="original-link">
+            <%= item.url %>
+          </div>
+
+        </li>
+
+      <% }) %>
+
+    </ul>
+
+  </div>
+
+</div>
+
 </body>
 </html>

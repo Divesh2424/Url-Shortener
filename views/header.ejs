@@ -1,21 +1,27 @@
-<!DOCTYPE html>
-<html lang="en">
-  <head>
-    <meta charset="UTF-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <link rel="stylesheet" href="style.css">
-    <title>Document</title>
-    <style></style>
-  </head>
-  <body>
-    <div class="nav-bar">
-      <nav>
-        <ul>
-          <li><a href="/">Home</a></li>
-          <li><a href="/login">Login</a></li>
-          <li><a href="/registration">Registration</a></li>
-        </ul>
-      </nav>
+<header class="navbar">
+
+  <div class="nav-container">
+
+    <div class="logo">
+      <a href="/">Shortify</a>
     </div>
-  </body>
-</html>
+
+    <nav>
+      <ul class="nav-links">
+
+        <li><a href="/">Home</a></li>
+
+        <% if(!user) { %>
+          <li><a href="/login">Login</a></li>
+          <li><a href="/registration" class="nav-btn">Register</a></li>
+        <% } else { %>
+          <li><a href="/me">Profile</a></li>
+          <li><a href="/logout" class="nav-btn">Logout</a></li>
+        <% } %>
+
+      </ul>
+    </nav>
+
+  </div>
+
+</header>

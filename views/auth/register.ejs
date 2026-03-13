@@ -9,44 +9,62 @@
 
   <body>
     <%- include('../header') %>
-    <div class="container">
-      <h1>Create Account</h1>
 
-      <form action="/registration" method="post">
-        <label for="name">Full Name</label>
-        <input
-          type="text"
-          name="name"
-          id="name"
-          placeholder="Enter your name"
-          required
-        />
+    <div class="auth-wrapper">
+      <div class="auth-card">
+        <h1 class="auth-title">Create Account</h1>
+        <p class="auth-subtitle">Join us and start using the platform</p>
 
-        <label for="email">Email</label>
-        <input
-          type="email"
-          name="email"
-          id="email"
-          placeholder="Enter your email"
-          required
-        />
+        <form action="/registration" method="post" class="auth-form">
 
-        <label for="password">Password</label>
-        <input
-          type="password"
-          name="password"
-          id="password"
-          placeholder="Create password"
-          required
-        />
+          <div class="input-group">
+            <label for="name">Full Name</label>
+            <input
+              type="text"
+              name="name"
+              id="name"
+              placeholder="Enter your name"
+              required
+            />
+          </div>
 
-        <button type="submit">Register</button>
-      </form>
+          <div class="input-group">
+            <label for="email">Email</label>
+            <input
+              type="email"
+              name="email"
+              id="email"
+              placeholder="Enter your email"
+              required
+            />
+          </div>
 
-      <p style="margin-top: 10px">
-        Already have an account?
-        <a href="/login">Login</a>
-      </p>
+          <div class="input-group">
+            <label for="password">Password</label>
+            <input
+              type="password"
+              name="password"
+              id="password"
+              placeholder="Create password"
+              required
+            />
+          </div>
+
+          <% if(errors && errors.length > 0) { %>
+            <% errors.forEach((error) => { %> 
+              <p class="flash-error" style="color: red;"><%= error %></p>
+            <% }) %>
+          <% } %>
+
+          <button type="submit" class="auth-btn">Register</button>
+        </form>
+
+        <p class="auth-footer">
+          Already have an account?
+          <a href="/login">Login</a>
+        </p>
+      </div>
     </div>
+
   </body>
 </html>

@@ -9,35 +9,49 @@
 
   <body>
     <%- include('../header') %>
-    <div class="container">
-      <h1>Login</h1>
 
-      <form action="/login" method="post">
-        <label for="email">Email</label>
-        <input
-          type="email"
-          name="email"
-          id="email"
-          placeholder="Enter your email"
-          required
-        />
+    <div class="auth-wrapper">
+      <div class="auth-card">
+        <h1 class="auth-title">Welcome Back</h1>
+        <p class="auth-subtitle">Login to your account</p>
 
-        <label for="password">Password</label>
-        <input
-          type="password"
-          name="password"
-          id="password"
-          placeholder="Enter your password"
-          required
-        />
+        <form action="/login" method="post" class="auth-form">
+          <div class="input-group">
+            <label for="email">Email</label>
+            <input
+              type="email"
+              name="email"
+              id="email"
+              placeholder="Enter your email"
+              required
+            />
+          </div>
 
-        <button type="submit">Login</button>
-      </form>
+          <div class="input-group">
+            <label for="password">Password</label>
+            <input
+              type="password"
+              name="password"
+              id="password"
+              placeholder="Enter your password"
+              required
+            />
+          </div>
 
-      <p style="margin-top: 10px">
-        Don't have an account?
-        <a href="/registration">Register</a>
-      </p>
+          <% if(errors && errors.length > 0) { %>
+            <% errors.forEach((error) => { %> 
+              <p class="flash-error" style="color: red;"><%= error %></p>
+            <% }) %>
+          <% } %>
+
+          <button type="submit" class="auth-btn">Login</button>
+        </form>
+
+        <p class="auth-footer">
+          Don't have an account?
+          <a href="/registration">Register</a>
+        </p>
+      </div>
     </div>
   </body>
 </html>
