@@ -4,6 +4,8 @@ import { loadLinks, saveLinks, getLinkByShortCode } from "../services/shortener.
 
 export const postUrlShortener = async (req, res) => {
   try {
+    if(!req.user) return res.redirect("/login");
+    
     const { enterurl, shorturl } = req.body;
 
     const finalShortUrl = shorturl || crypto.randomBytes(5).toString("hex");
@@ -15,7 +17,7 @@ export const postUrlShortener = async (req, res) => {
       return res.status(409).send("Short code already exists");
     }
    
-    await saveLinks({url : enterurl, shortCode : finalShortUrl})
+    await saveLinks({url : enterurl, shortCode : finalShortUrl, userId : req.user.id})
 
     return res.redirect("/");
   } catch (error) {
@@ -26,7 +28,8 @@ export const postUrlShortener = async (req, res) => {
 
 export const getShortnerPage = async (req, res) => {
   try {
-    const links = await loadLinks();
+    if(!req.user) return res.redirect("/login");
+    const links = await loadLinks(req.user.id);
 
     return res.render("index", {
       links,

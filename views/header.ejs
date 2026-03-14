@@ -9,13 +9,12 @@
     <nav>
       <ul class="nav-links">
 
-        <li><a href="/">Home</a></li>
-
         <% if(!user) { %>
           <li><a href="/login">Login</a></li>
           <li><a href="/registration" class="nav-btn">Register</a></li>
-        <% } else { %>
-          <li><a href="/me">Profile</a></li>
+          <% } else { %>
+            <li><a href="/">Home</a></li>
+            <li><a href="/me">Profile</a></li>
           <li><a href="/logout" class="nav-btn">Logout</a></li>
         <% } %>
 

@@ -51,9 +51,11 @@
           </div>
 
           <% if(errors && errors.length > 0) { %>
+          <div class="error-box">
             <% errors.forEach((error) => { %> 
-              <p class="flash-error" style="color: red;"><%= error %></p>
-            <% }) %>
+            <p class="flash-error"><%= error %></p>
+          <% }) %>
+          </div>
           <% } %>
 
           <button type="submit" class="auth-btn">Register</button>
