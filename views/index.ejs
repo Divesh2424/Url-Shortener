@@ -22,7 +22,7 @@
       <p class="status warning">You are not logged in</p>
     <% } %>
 
-    <h1 class="page-title">URL Shortener</h1>
+    <h1 class="page-title">Chhota Link</h1>
 
     <form action="/" method="post" class="shortener-form">
 
@@ -36,6 +36,14 @@
             <input type="text" name="shorturl" id="shorturl" placeholder="custom-name">
         </div>
 
+        <% if(errors && errors.length > 0) { %>
+          <div class="error-box">
+            <% errors.forEach((error) => { %> 
+            <p class="flash-error"><%= error %></p>
+          <% }) %>
+          </div>
+          <% } %>
+          
         <button type="submit" id="submitbtn" class="primary-btn">
             Shorten URL
         </button>
@@ -60,11 +68,18 @@
               <%= host %>/<%= item.shortCode %>
             </a>
           </div>
-
           <div class="original-link">
-            <%= item.url %>
+            -> <%= item.url %>
           </div>
-
+          
+          <div class="edit-link">
+            <a href="/edit/<%= item.id %>" class="edit-btn">✏️</a>
+              <form action="/delete/<%= item.id %>" method="post" style="display:inline;" onsubmit="return confirm('Are you sure you want to delete?')">
+                <button type="submit" style="border:none; background:none; cursor:pointer; padding: 0px 5px;">
+                  🗑️
+                </button>
+              </form>
+          </div>
         </li>
 
       <% }) %>

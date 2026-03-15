@@ -5,6 +5,7 @@ import {
   comparePasswords,
   generateToken,
 } from "../services/auth.services.js";
+import { registrationSchema, loginUserSchema } from "../validators/auth-validators.js";
 
 export const getLoginPage = (req, res) => {
    if(req.user) {
@@ -29,7 +30,14 @@ export const postLogin = async (req, res) => {
     return res.redirect("/");
   }
 
-  const { email, password } = req.body;
+  const {data, error} = loginUserSchema.safeParse(req.body);
+  
+  if(error) {
+    const err = error.issues[0].message;
+    req.flash("errors", err);
+    return res.redirect("/login");
+  }
+  const { email, password } = data;
 
   const user = await getUserByEmail(email);
   if (!user) {
@@ -58,7 +66,16 @@ export const postRegistrationPage = async (req, res) => {
     if (req.user) {
       return res.redirect("/");
     }
-    const { name, email, password } = req.body;
+    
+    const {data, error} = registrationSchema.safeParse(req.body);
+
+    if(error) {
+      const errors = error.issues[0].message;
+      req.flash("errors", errors);
+      return res.redirect("/registration");
+    }
+    
+    const { name, email, password } = data;
 
     //to check if data already exists
     const existingUser = await getUserByEmail(email);

@@ -1,30 +1,3 @@
-//if we will use prisma 
-
-// import { PrismaClient } from "@prisma/client";
-
-// const prisma = new PrismaClient();
-
-// export const loadLinks = async () => {
-//     const allLinks = await prisma.shortLink.findMany();
-//     return allLinks;
-// }
-
-// export const getLinkByShortCode = async (shortcode) => {
-//     const shortLink = await prisma.shortLink.findUnique({
-//         where : {shortCode : shortcode}
-//     })
-//     return shortLink;
-// }
-
-// export const saveLinks = async ({url, shortCode}) => {
-//     const newShortLink = await prisma.shortLink.create({
-//         data : { shortCode, url}
-//     })
-//     return newShortLink;
-// }
-
-//if we will use drizzle
-
 import { db } from "../config/db.js";
 import { shortLinkTable } from "../drizzle/schema.js";
 import { eq } from "drizzle-orm";
@@ -42,4 +15,17 @@ export const getLinkByShortCode = async (shortcode) => {
 export const saveLinks = async ({url, shortCode, userId}) => {
     const newShortLink = await db.insert(shortLinkTable).values({url, shortCode, userId});
     return newShortLink;
+}
+
+export const findLinkById = async (id) => {
+    const [link] = await db.select().from(shortLinkTable).where(eq(shortLinkTable.id, id));
+    return link;
+}
+
+export const updateUrlById = async ({id, url, shortCode}) => {
+    return await db.update(shortLinkTable).set({url, shortCode}).where(eq(shortLinkTable.id, id));
+}
+
+export const deleteUrlById = async (id) => {
+    return await db.delete(shortLinkTable).where(eq(shortLinkTable.id, id));
 }

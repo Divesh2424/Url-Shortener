@@ -1,0 +1,51 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Edit URL</title>
+<link rel="stylesheet" href="/style.css">
+</head>
+
+<body>
+
+<%- include('header') %>
+
+<div class="edit-wrapper">
+
+  <div class="edit-card">
+
+    <h1 class="edit-title">Edit Short Link</h1>
+
+    <form action="/edit/<%= id %>" method="post" class="edit-form">
+
+      <div class="input-group">
+        <label>Original URL</label>
+        <input type="url" name="url" value="<%= link.url %>" required>
+      </div>
+
+      <div class="input-group">
+        <label>Short Code</label>
+        <input type="text" name="shortCode" value="<%= link.shortCode %>">
+      </div>
+
+      <% if(errors && errors.length > 0) { %>
+          <div class="error-box">
+            <% errors.forEach((error) => { %> 
+            <p class="flash-error"><%= error %></p>
+          <% }) %>
+          </div>
+      <% } %>
+
+      <button type="submit" class="primary-btn">
+        Update Link
+      </button>
+
+    </form>
+
+  </div>
+
+</div>
+
+</body>
+</html>

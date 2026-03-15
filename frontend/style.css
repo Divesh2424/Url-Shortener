@@ -205,6 +205,10 @@ input:focus{
   color:gray;
 }
 
+.edit-link {
+  
+}
+
 
 /* STATUS */
 
@@ -284,4 +288,32 @@ input:focus{
 .flash-error{
   color:#cc0000;
   font-size:14px;
+}
+
+/* EDIT PAGE */
+
+.edit-wrapper{
+  display:flex;
+  justify-content:center;
+  align-items:center;
+  min-height:80vh;
+}
+
+.edit-card{
+  background:white;
+  padding:35px;
+  border-radius:12px;
+  width:420px;
+  box-shadow:0 10px 25px rgba(0,0,0,0.15);
+}
+
+.edit-title{
+  text-align:center;
+  margin-bottom:25px;
+}
+
+.edit-form{
+  display:flex;
+  flex-direction:column;
+  gap:15px;
 }

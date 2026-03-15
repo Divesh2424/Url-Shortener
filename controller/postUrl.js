@@ -1,12 +1,20 @@
 import crypto from "crypto";
-import { loadLinks, saveLinks, getLinkByShortCode } from "../services/shortener.services.js";
-// import { url } from "inspector";
+import { loadLinks, saveLinks, getLinkByShortCode, findLinkById, updateUrlById, deleteUrlById } from "../services/shortener.services.js";
+import { urlSchema } from "../validators/url-validators.js";
 
 export const postUrlShortener = async (req, res) => {
   try {
     if(!req.user) return res.redirect("/login");
     
-    const { enterurl, shorturl } = req.body;
+    const {data, error} = urlSchema.safeParse(req.body);
+
+    if(error) {
+      const err = error.issues[0].message;
+      req.flash("errors", err);
+      return res.redirect("/");
+    }
+
+    const { enterurl, shorturl } = data;
 
     const finalShortUrl = shorturl || crypto.randomBytes(5).toString("hex");
 
@@ -14,7 +22,8 @@ export const postUrlShortener = async (req, res) => {
     const existingLink = await getLinkByShortCode(finalShortUrl);
 
     if (existingLink) {
-      return res.status(409).send("Short code already exists");
+      req.flash("errors", "Shortcode already exists. Please choose another!")
+      return res.redirect("/");
     }
    
     await saveLinks({url : enterurl, shortCode : finalShortUrl, userId : req.user.id})
@@ -33,7 +42,9 @@ export const getShortnerPage = async (req, res) => {
 
     return res.render("index", {
       links,
-      host: req.headers.host
+      host: req.headers.host,
+      errors : req.flash("errors"),
+      userId : req.user.id
     });
   } catch (error) {
     console.log(error.message);
@@ -57,3 +68,35 @@ export const redirectToShortLink = async (req, res) => {
     return res.status(500).send("Internal Server Error");
   }
 };
+
+export const getEditPage = async (req, res) => {
+  const { id } = req.params;
+  const link = await findLinkById(id);
+  return res.render("edit", {
+    link,
+    id,
+    errors: req.flash("errors")
+  })
+}
+
+export const postUpdatedUrl = async (req, res) => {
+  const { id } = req.params;
+  const {url, shortCode} = req.body;
+
+  const existingLink = await getLinkByShortCode(shortCode);
+
+  if (existingLink) {
+    req.flash("errors", "Shortcode already exists. Please choose another!")
+    return res.redirect(`/edit/${id}`);
+  }
+
+  await updateUrlById({id, url, shortCode});
+
+  return res.redirect("/");
+}
+
+export const deleteUrl = async (req, res) => {
+  const {id} = req.params;
+  await deleteUrlById(id);
+  return res.redirect("/");
+}
