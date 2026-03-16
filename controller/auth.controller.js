@@ -3,7 +3,7 @@ import {
   saveData,
   hashingPasswords,
   comparePasswords,
-  generateToken,
+  // generateToken,
 } from "../services/auth.services.js";
 import { registrationSchema, loginUserSchema } from "../validators/auth-validators.js";
 
@@ -51,13 +51,13 @@ export const postLogin = async (req, res) => {
     res.redirect("/login");
   }
 
-  const token = await generateToken({
-    id: user.id,
-    name: user.name,
-    email: user.email,
-  });
+  // const token = await generateToken({
+  //   id: user.id,
+  //   name: user.name,
+  //   email: user.email,
+  // });
 
-  res.cookie("access_token", token);
+  // res.cookie("access_token", token);
   return res.redirect("/");
 };
 

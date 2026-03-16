@@ -1,10 +1,11 @@
 import express from "express";
-import {shortenerUrls} from "../routes/shortener.routes.js";
-import { authRoutes } from "../routes/auth.routes.js";
 import { env } from "../config/env.js";
 import cookieParser from "cookie-parser";
 import session from "express-session";
 import flash from "connect-flash";
+import requestIp from "request-ip";
+import {shortenerUrls} from "../routes/shortener.routes.js";
+import { authRoutes } from "../routes/auth.routes.js";
 import { verifyAuthentication } from "../middlewares/verify-auth-middleware.js"
 
 const app = express();
@@ -19,6 +20,7 @@ app.use(session({
   saveUninitialized: false
 }));
 app.use(flash());
+app.use(requestIp.mw());
 app.use(verifyAuthentication);
 app.use((req, res, next) => {
   res.locals.user = req.user;
