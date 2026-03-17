@@ -20,7 +20,7 @@ app.use(session({
   saveUninitialized: false
 }));
 app.use(flash());
-app.use(requestIp.mw());
+app.use(requestIp.mw()); //here mw -> middleware
 app.use(verifyAuthentication);
 app.use((req, res, next) => {
   res.locals.user = req.user;

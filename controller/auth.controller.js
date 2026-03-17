@@ -3,7 +3,13 @@ import {
   saveData,
   hashingPasswords,
   comparePasswords,
-  // generateToken,
+  createSession,
+  createAccessToken,
+  createRefreshToken,
+  clearUserSession,
+  authenticateFunc,
+  fetchUserById,
+  getAllShortLinks
 } from "../services/auth.services.js";
 import { registrationSchema, loginUserSchema } from "../validators/auth-validators.js";
 
@@ -51,13 +57,8 @@ export const postLogin = async (req, res) => {
     res.redirect("/login");
   }
 
-  // const token = await generateToken({
-  //   id: user.id,
-  //   name: user.name,
-  //   email: user.email,
-  // });
+  await authenticateFunc({req, res, user});
 
-  // res.cookie("access_token", token);
   return res.redirect("/");
 };
 
@@ -87,24 +88,43 @@ export const postRegistrationPage = async (req, res) => {
 
     const hashedPassword = await hashingPasswords(password);
     //if not then store it in database
-    await saveData({ name, email, password: hashedPassword });
+    const newUser = await saveData({ name, email, password: hashedPassword });
 
-    res.redirect("/login");
+    await authenticateFunc({req, res, user: newUser, name, email});
+
+    return res.redirect("/login");
   } catch (error) {
     console.error("Error posting registration data", error);
     res.send("Error posting registration data");
   }
 };
 
-export const getProfilePage = (req, res) => {
+export const getProfilePage = async (req, res) => {
   if (!req.user) {
-    res.send("Not Logged In");
+    return res.send("Not Logged In");
   }
-  // return res.send(`<h1>Hey ${req.user.name}</h1>`);
-  return res.render("auth/profile")
+
+  const user = await fetchUserById(req.user.id);
+
+  if(!user) return res.redirect("/login"); 
+
+  const userShortLinks = await getAllShortLinks(user.id);
+
+  return res.render("auth/profile", {
+    user : {
+      id : user.id,
+      name : user.name,
+      email : user.email,
+      createdAt : user.createdAt,
+      links : userShortLinks
+    }
+  })
 };
 
-export const logoutUser = (req, res) => {
-  res.clearCookie("access_token");
+export const logoutUser = async (req, res) => {
+  await clearUserSession(req.user.sessionId);
+  const baseConfig = {httpOnly : true, secure : true}
+  res.clearCookie("access_token", baseConfig);
+  res.clearCookie("refresh_token", baseConfig);
   return res.redirect("/login");
 };

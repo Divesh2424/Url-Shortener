@@ -1,12 +1,48 @@
-import { verifyJWT } from "../services/auth.services.js";
+import { verifyJWT, refreshTokens } from "../services/auth.services.js";
 
-export const verifyAuthentication = (req, res, next) => {
-    const token = req.cookies.access_token;
-    if(!token) {
-        req.user = null;
+// export const verifyAuthentication = (req, res, next) => {
+//     const token = req.cookies.access_token;
+//     if(!token) {
+//         req.user = null;
+//         return next();
+//     }
+//     const decodedToken = verifyJWT(token);
+//     req.user = decodedToken;
+//     return next();
+// }
+
+export const verifyAuthentication = async (req, res, next) => {
+    const accessToken = req.cookies.access_token;
+    const refreshToken = req.cookies.refresh_token;
+
+    req.user = null;
+    if(!accessToken && !refreshToken) {
         return next();
     }
-    const decodedToken = verifyJWT(token);
-    req.user = decodedToken;
+
+    if(accessToken) {
+        const decodedToken = verifyJWT(accessToken);
+        req.user = decodedToken;
+        return next();
+    }
+
+    if(refreshToken) {
+        try {
+            const {newAccessToken, newRefreshToken, user} = await refreshTokens(refreshToken);
+            req.user = user;
+            const basicConf = {httpOnly : true, secure : true}
+            res.cookie("access_token", newAccessToken, {
+                ...basicConf,
+                maxAge : 15 * 60 * 1000 //15 minutes
+            })
+            res.cookie("refresh_token", newRefreshToken, {
+                ...basicConf,
+                maxAge : 7 * 24 * 60 * 60 * 1000 //7 days
+            })
+            return next();
+        } catch (error) {
+            console.log(error.message);
+        }
+    }
     return next();
 }
