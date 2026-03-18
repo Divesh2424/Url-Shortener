@@ -17,12 +17,10 @@
 
     <% if(user) { %>
       <p class="status success">You are Logged in</p>
-      <h4 style="margin-bottom: 4px;">Hi <%= user.name %>,</h4>
+      <h4 style="margin: 12px 0px;">Hi <%= user.name %>,</h4>
     <% } else { %>
       <p class="status warning">You are not logged in</p>
     <% } %>
-
-    <h1 class="page-title">Chhota Link</h1>
 
     <form action="/" method="post" class="shortener-form">
 

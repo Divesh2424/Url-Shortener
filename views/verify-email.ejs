@@ -1,0 +1,54 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Verify Email</title>
+    <link rel="stylesheet" href="/style.css">
+</head>
+
+<body>
+
+<%- include('./header') %>
+
+<div class="verify-container">
+
+    <div class="verify-card">
+
+        <h2>📧 Verify Your Email</h2>
+
+        <p class="info-text">
+            We have sent a verification code to:
+        </p>
+
+        <p class="email"><%= user.email %></p>
+
+        <!-- OTP Form -->
+        <form action="/verify-email" method="POST" class="verify-form">
+
+            <input 
+                type="text" 
+                name="otp" 
+                placeholder="Enter OTP"
+                required
+                class="otp-input"
+            >
+
+            <button type="submit" class="btn verify-btn">
+                Verify Email
+            </button>
+
+        </form>
+
+        <!-- Resend -->
+        <div class="extra-actions">
+            <p>Didn't receive code?</p>
+            <a href="/resend-verification-email" class="resend-link">Resend Verification Link</a>
+        </div>
+
+    </div>
+
+</div>
+
+</body>
+</html>

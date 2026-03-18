@@ -9,7 +9,10 @@ import {
   clearUserSession,
   authenticateFunc,
   fetchUserById,
-  getAllShortLinks
+  getAllShortLinks,
+  generateRandomToken,
+  insertVerifyEmailTokenInDb,
+  createVerifyEmailLink
 } from "../services/auth.services.js";
 import { registrationSchema, loginUserSchema } from "../validators/auth-validators.js";
 
@@ -115,6 +118,7 @@ export const getProfilePage = async (req, res) => {
       id : user.id,
       name : user.name,
       email : user.email,
+      isEmailValid : user.isEmailValid,
       createdAt : user.createdAt,
       links : userShortLinks
     }
@@ -128,3 +132,18 @@ export const logoutUser = async (req, res) => {
   res.clearCookie("refresh_token", baseConfig);
   return res.redirect("/login");
 };
+
+export const getEmailVerificationPage = (req, res) => {
+  return res.render("verify-email")
+}
+
+export const resendVerificationEmail = async (req, res) => {
+  const randomToken = generateRandomToken();
+
+  await insertVerifyEmailTokenInDb({userId : req.user.id, token : randomToken});
+
+  const verifyEmailLink = await createVerifyEmailLink({
+    email : req.user.email,
+    token : randomToken
+  })
+}

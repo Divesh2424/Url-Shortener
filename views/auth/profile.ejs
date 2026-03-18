@@ -11,34 +11,64 @@
 
 <%- include('../header') %>
 
-<div class="profile-wrapper">
+<div class="profile-container">
 
-    <div class="profile-card">
-
-        <h1 class="profile-title">User Profile</h1>
-
-        <div class="profile-info">
-
-            <div class="profile-row">
-                <span class="profile-label">Name:</span>
-                <span class="profile-value"><%= user.name %></span>
-            </div>
-
-            <div class="profile-row">
-                <span class="profile-label">Email:</span>
-                <span class="profile-value"><%= user.email %></span>
-            </div>
-
-            <div class="profile-row">
-                <span class="profile-label">User ID:</span>
-                <span class="profile-value"><%= user.id %></span>
-            </div>
-
+    <!-- Top Card -->
+    <div class="profile-header">
+        <div class="avatar">
+            <%= user.name.charAt(0).toUpperCase() %>
         </div>
 
-        <div class="profile-actions">
-            <a href="/" class="primary-btn">Back to Home</a>
+        <div class="user-details">
+            <h2><%= user.name %></h2>
+            <p>📧 <%= user.email %></p>
+            <p>📅 Member since <%= new Date(user.createdAt).toLocaleDateString() %></p>
         </div>
+    </div>
+
+    <!-- Stats -->
+    <div class="stats">
+
+        <div class="stat-box">
+            <h3><%= user.links.length %></h3>
+            <p>LINKS CREATED</p>
+        </div>
+
+        <div class="stat-box">
+            <h3>0</h3>
+            <p>TOTAL CLICKS</p>
+        </div>
+
+        <div class="stat-box">
+            <h3>
+                <%= user.lastLogin ? "Today" : "N/A" %>
+            </h3>
+            <p>LAST ACTIVE</p>
+        </div>
+
+    </div>
+    <!-- Email Verification -->
+<div class="email-verification">
+
+    <p>
+        📧 Email Status: 
+        <% if (user.isEmailValid) { %>
+            <span style="color: green; font-weight: bold;">Verified ✅</span>
+        <% } else { %>
+            <span style="color: red; font-weight: bold;">Not Verified ❌</span>
+            <a href="/verify-email" class="btn verify" >Verify Now</a>
+        <% } %>
+    </p>
+
+</div>
+    <!-- Actions -->
+    <div class="actions">
+
+        <a href="#" class="btn edit">✏️ Edit Profile</a>
+
+        <a href="/forgot-password" class="btn password">🔑 Forgot Password</a>
+
+        <a href="/logout" class="btn logout">⏻ Logout</a>
 
     </div>
 
