@@ -27,6 +27,7 @@
     "mongodb": "^7.1.0",
     "mongoose": "^9.2.3",
     "mysql2": "^3.19.1",
+    "nodemailer": "^8.0.2",
     "request-ip": "^3.3.0",
     "zod": "^4.3.6"
   },

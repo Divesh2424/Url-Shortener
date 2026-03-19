@@ -1,16 +1,5 @@
 import { verifyJWT, refreshTokens } from "../services/auth.services.js";
 
-// export const verifyAuthentication = (req, res, next) => {
-//     const token = req.cookies.access_token;
-//     if(!token) {
-//         req.user = null;
-//         return next();
-//     }
-//     const decodedToken = verifyJWT(token);
-//     req.user = decodedToken;
-//     return next();
-// }
-
 export const verifyAuthentication = async (req, res, next) => {
     const accessToken = req.cookies.access_token;
     const refreshToken = req.cookies.refresh_token;

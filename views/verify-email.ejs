@@ -24,15 +24,16 @@
         <p class="email"><%= user.email %></p>
 
         <!-- OTP Form -->
-        <form action="/verify-email" method="POST" class="verify-form">
+        <form action="/verify-email-token" method="get" class="verify-form">
 
             <input 
                 type="text" 
-                name="otp" 
+                name="token" 
                 placeholder="Enter OTP"
                 required
                 class="otp-input"
             >
+            <input type="hidden" name="email" value="<%= user.email %>" />
 
             <button type="submit" class="btn verify-btn">
                 Verify Email

@@ -1,9 +1,10 @@
 import { db } from "../config/db.js";
 import { sessionsTable, shortLinkTable, usersTable, verifyEmailTokenTable } from "../drizzle/schema.js";
-import { eq, sql } from "drizzle-orm";
+import { and, eq, gte, lt, sql } from "drizzle-orm";
 import argon2 from "argon2";
 import jwt from "jsonwebtoken";
 import crypto from "crypto";
+import { sendEmail } from "../lib/nodemailer.js";
 
 export const getUserByEmail = async (email) => {
     const [getUser] = await db.select().from(usersTable).where(eq(usersTable.email, email));
@@ -129,11 +130,77 @@ export const generateRandomToken = (digit = 8) => {
 }
 
 export const insertVerifyEmailTokenInDb = async ({ userId, token }) => {
-    await db.delete(verifyEmailTokenTable).where(lt(verifyEmailTokenTable.expiresAt, sql`CURRENT_TIMESTAMP`));
-    return await db.insert(verifyEmailTokenTable).values({userId, token});
+    return db.transaction(async (tx) => {
+        try {
+            //delete expiry tokens
+            await tx.delete(verifyEmailTokenTable).where(lt(verifyEmailTokenTable.expiresAt, sql`CURRENT_TIMESTAMP`));
+            
+            //delete any existing token for specific user
+            await tx.delete(verifyEmailTokenTable).where(eq(verifyEmailTokenTable.userId, userId));
+            
+            //new token insert for the user
+            await tx.insert(verifyEmailTokenTable).values({userId, token});
+        } catch (error) {
+            console.error("Failed to insert Verification Token:", error);
+            throw new Error("Unable to create verification token");
+        }
+    })
 }
 
 export const createVerifyEmailLink = async ({email, token}) => {
-    const uriEncodedEmail = encodeURIComponent(email);
-    return `${process.env.FRONTEND_URL}/verify-email?token=${token}&email=${uriEncodedEmail}`;
+    // const uriEncodedEmail = encodeURIComponent(email);
+    // return `${process.env.FRONTEND_URL}/verify-email-token?token=${token}&email=${uriEncodedEmail}`;
+    const url = new URL(`${process.env.FRONTEND_URL}/verify-email-token`);
+    url.searchParams.append('token', token);
+    url.searchParams.append('email', email);
+
+    return url.toString();
+}
+
+export const findVerificationEmailToken = async ({token, email}) => {
+    return await db.select({
+        userId : usersTable.id,
+        email : usersTable.email,
+        token : verifyEmailTokenTable.token,
+        expiresAt : verifyEmailTokenTable.expiresAt
+    }).from(verifyEmailTokenTable)
+    .where(
+        and(
+            eq(verifyEmailTokenTable.token, token),
+            eq(usersTable.email, email),
+            gte(verifyEmailTokenTable.expiresAt, sql`CURRENT_TIMESTAMP`)
+        )
+    )
+    .innerJoin(usersTable, eq(verifyEmailTokenTable.userId, usersTable.id))
+}
+
+export const verifyUserEmailAndUpdate = async (email) => {
+    return await db.update(usersTable).set({isEmailValid : true}).where(eq(usersTable.email, email));
+}
+
+export const clearVerifyEmailTokens = async (email) => {
+    const [user] = await db.select().from(usersTable).where(eq(usersTable.email, email));
+
+    return await db.delete(verifyEmailTokenTable).where(eq(verifyEmailTokenTable.userId, user.id));
+}
+
+export const sendNewVerifyEmail = async ({email, userId}) => {
+    const randomToken = generateRandomToken();
+    
+      await insertVerifyEmailTokenInDb({userId, token : randomToken});
+    
+      const verifyEmailLink = await createVerifyEmailLink({
+        email,
+        token : randomToken
+      });
+    
+      await sendEmail({
+        to : email,
+        subject : "Verify your Email",
+        html : `
+            <h1>Click the link below to verify your email</h1>
+            <p>You can use this token : <code>${randomToken}</code></p>
+            <a href="${verifyEmailLink}">Verify Email</a>
+        `
+        }).catch(console.error);
 }

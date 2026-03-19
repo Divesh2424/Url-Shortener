@@ -1,3 +1,4 @@
+import { sendEmail } from "../lib/nodemailer.js";
 import {
   getUserByEmail,
   saveData,
@@ -12,9 +13,13 @@ import {
   getAllShortLinks,
   generateRandomToken,
   insertVerifyEmailTokenInDb,
-  createVerifyEmailLink
+  createVerifyEmailLink,
+  findVerificationEmailToken,
+  verifyUserEmailAndUpdate,
+  clearVerifyEmailTokens,
+  sendNewVerifyEmail
 } from "../services/auth.services.js";
-import { registrationSchema, loginUserSchema } from "../validators/auth-validators.js";
+import { registrationSchema, loginUserSchema, verifyEmailSchema } from "../validators/auth-validators.js";
 
 export const getLoginPage = (req, res) => {
    if(req.user) {
@@ -95,6 +100,8 @@ export const postRegistrationPage = async (req, res) => {
 
     await authenticateFunc({req, res, user: newUser, name, email});
 
+    await sendNewVerifyEmail({email, userId : newUser.id});
+
     return res.redirect("/login");
   } catch (error) {
     console.error("Error posting registration data", error);
@@ -138,12 +145,27 @@ export const getEmailVerificationPage = (req, res) => {
 }
 
 export const resendVerificationEmail = async (req, res) => {
-  const randomToken = generateRandomToken();
+  
+  await sendNewVerifyEmail({email : req.user.email, userId : req.user.id});
 
-  await insertVerifyEmailTokenInDb({userId : req.user.id, token : randomToken});
+  return res.redirect("/verify-email");
+}
 
-  const verifyEmailLink = await createVerifyEmailLink({
-    email : req.user.email,
-    token : randomToken
-  })
+export const verifyEmailToken = async (req, res) => {
+
+  const {data, error} = verifyEmailSchema.safeParse(req.query);
+
+  if(error) {
+    return res.send("Verification link is invalid/expired");
+  }
+
+  const [token] = await findVerificationEmailToken(data);
+ 
+  if(!token) res.send("Verification link is invalid/expired");
+
+  await verifyUserEmailAndUpdate(token.email);
+
+  await clearVerifyEmailTokens(token.email).catch(console.error);
+  
+  return res.redirect("/me");
 }
