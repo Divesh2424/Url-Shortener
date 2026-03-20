@@ -17,9 +17,10 @@ import {
   findVerificationEmailToken,
   verifyUserEmailAndUpdate,
   clearVerifyEmailTokens,
-  sendNewVerifyEmail
+  sendNewVerifyEmail,
+  updateUsersTableInDB
 } from "../services/auth.services.js";
-import { registrationSchema, loginUserSchema, verifyEmailSchema } from "../validators/auth-validators.js";
+import { registrationSchema, loginUserSchema, verifyEmailSchema, nameSchema } from "../validators/auth-validators.js";
 
 export const getLoginPage = (req, res) => {
    if(req.user) {
@@ -167,5 +168,37 @@ export const verifyEmailToken = async (req, res) => {
 
   await clearVerifyEmailTokens(token.email).catch(console.error);
   
+  return res.redirect("/me");
+}
+
+export const getEditProfilePage = async (req, res) => {
+  const user = await fetchUserById(req.user.id);
+
+  return res.render("auth/edit-profile", {
+    name : user.name,
+    errors : req.flash("errors")
+  });
+}
+
+export const postUpdatedProfilePage = async (req, res) => {
+    try {
+       
+    const {data, error} = nameSchema.safeParse(req.body);
+
+    if(error) {
+      const err = error.issues[0].message;
+      req.flash("errors", err);
+      return res.redirect("/edit-profile");
+    }
+
+    const user = await fetchUserById(req.user.id);
+
+    await updateUsersTableInDB({userId: user.id, name : data.name});
+
+    return res.redirect("/me");
+  } catch (error) {
+    console.error("Error updating data", error);
+    res.send("Error updating data");
+  }
   return res.redirect("/me");
 }

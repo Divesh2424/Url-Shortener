@@ -11,12 +11,16 @@ export const loginUserSchema = z.object({
         .max(100, {message: "Name must not be more than 100 chars!"}),
 });
 
-export const registrationSchema = loginUserSchema.extend({
+export const nameSchema = z.object({
     name: z
         .string()
         .trim()
         .min(3, {message : "Name must be atleast 3 chars long!"})
         .max(100, {message: "Name must not be more than 100 chars!"})
+});
+
+export const registrationSchema = loginUserSchema.extend({
+    name : nameSchema
 });
 
 export const verifyEmailSchema = z.object({

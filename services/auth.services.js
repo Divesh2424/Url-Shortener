@@ -4,7 +4,11 @@ import { and, eq, gte, lt, sql } from "drizzle-orm";
 import argon2 from "argon2";
 import jwt from "jsonwebtoken";
 import crypto from "crypto";
-import { sendEmail } from "../lib/nodemailer.js";
+import { sendEmail } from "../lib/send-email.js";
+import fs from "fs/promises";
+import path from "path";
+import mjml2html from "mjml";
+import ejs from "ejs";
 
 export const getUserByEmail = async (email) => {
     const [getUser] = await db.select().from(usersTable).where(eq(usersTable.email, email));
@@ -194,13 +198,21 @@ export const sendNewVerifyEmail = async ({email, userId}) => {
         token : randomToken
       });
     
+      const mjmlTemplate = await fs.readFile(path.join(import.meta.dirname, "..", "emails", "verify-email.mjml"), 'utf-8');
+
+      const filledTemplate = ejs.render(mjmlTemplate, {code: randomToken, link: verifyEmailLink});
+
+      //to convert mjml to html
+      const htmlOutput = mjml2html(filledTemplate).html;
+
       await sendEmail({
         to : email,
         subject : "Verify your Email",
-        html : `
-            <h1>Click the link below to verify your email</h1>
-            <p>You can use this token : <code>${randomToken}</code></p>
-            <a href="${verifyEmailLink}">Verify Email</a>
-        `
+        html : htmlOutput
         }).catch(console.error);
+}
+
+
+export const updateUsersTableInDB = async ({userId, name}) => {
+    return await db.update(usersTable).set({name}).where(eq(usersTable.id, userId));
 }

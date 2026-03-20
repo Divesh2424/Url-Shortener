@@ -7,7 +7,7 @@ export const shortLinkTable = mysqlTable('short_link', {
   shortCode: varchar("short_code", { length: 25 }).notNull().unique(),
   createdAt: timestamp("created_at").defaultNow().notNull(),
   updatedAt: timestamp("updated_at").defaultNow().onUpdateNow().notNull(),
-  userId: int("user_id").notNull().references(() => usersTable.id),
+  userId: int("user_id").notNull().references(() => usersTable.id, {onDelete : "cascade"}),
 });
 
 export const sessionsTable = mysqlTable('sessions', {

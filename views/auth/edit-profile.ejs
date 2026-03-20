@@ -1,0 +1,74 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Edit Profile</title>
+    <link rel="stylesheet" href="/style.css">
+</head>
+
+<body>
+
+<%- include('../header') %>
+
+<div class="edit-container">
+
+    <div class="edit-card">
+
+        <h2>✏️ Edit Profile</h2>
+
+        <form action="/edit-profile" method="POST" class="edit-form">
+
+            <!-- Name -->
+            <label>Name</label>
+            <input 
+                type="text" 
+                name="name" 
+                value="<%= name %>" 
+                required
+            >
+
+            <!-- Email -->
+            <!-- <label>Email</label>
+            <input 
+                type="email" 
+                name="email" 
+                value="<%= user.email %>" 
+                required
+            > -->
+
+            <!-- Optional: Password -->
+            <!-- <label>New Password (optional)</label>
+            <input 
+                type="password" 
+                name="password" 
+                placeholder="Enter new password"
+            > -->
+
+            <% if(errors && errors.length > 0) { %>
+          <div class="error-box">
+            <% errors.forEach((error) => { %> 
+            <p class="flash-error"><%= error %></p>
+          <% }) %>
+          </div>
+          <% } %>
+          
+            <!-- Buttons -->
+            <div class="edit-actions">
+                <button type="submit" class="btn save-btn">
+                    Save Changes
+                </button>
+
+                <a href="/me" class="btn cancel-btn">
+                    Cancel
+                </a>
+            </div>
+
+        </form>
+
+    </div>
+
+</div>
+
+</body>
+</html>

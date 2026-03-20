@@ -1,6 +1,7 @@
 import crypto from "crypto";
 import { loadLinks, saveLinks, getLinkByShortCode, findLinkById, updateUrlById, deleteUrlById } from "../services/shortener.services.js";
 import { urlSchema } from "../validators/url-validators.js";
+import { fetchUserById } from "../services/auth.services.js";
 
 export const postUrlShortener = async (req, res) => {
   try {
@@ -38,13 +39,17 @@ export const postUrlShortener = async (req, res) => {
 export const getShortnerPage = async (req, res) => {
   try {
     if(!req.user) return res.redirect("/login");
+
+    
     const links = await loadLinks(req.user.id);
+    const user = await fetchUserById(req.user.id);
 
     return res.render("index", {
       links,
       host: req.headers.host,
       errors : req.flash("errors"),
-      userId : req.user.id
+      userId : user.id,
+      name : user.name
     });
   } catch (error) {
     console.log(error.message);
