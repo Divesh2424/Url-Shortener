@@ -36,7 +36,16 @@ export const verifyEmailTokenTable = mysqlTable('verify_email_tokens', {
   token: varchar({length: 8}).notNull(),
   expiresAt: timestamp('expires_at').default(sql`(CURRENT_TIMESTAMP + INTERVAL 1 DAY)`).notNull(),
   createdAt: timestamp('created_at').defaultNow().notNull()
-})
+});
+
+export const passwordResetTokenTable = mysqlTable('password_reset_tokens', {
+  id: int().autoincrement().primaryKey(),
+  userId: int('user_id').notNull().references(() => usersTable.id, {onDelete : "cascade"}),
+  tokenHash: text("token_hash").notNull(),
+  expiresAt: timestamp('expires_at').default(sql`(CURRENT_TIMESTAMP + INTERVAL 1 HOUR)`).notNull(),
+  createdAt: timestamp('created_at').defaultNow().notNull()
+});
+
 
 export const usersRelation = relations(usersTable, ({many}) => ({
   shortLink : many(shortLinkTable),

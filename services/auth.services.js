@@ -1,5 +1,5 @@
 import { db } from "../config/db.js";
-import { sessionsTable, shortLinkTable, usersTable, verifyEmailTokenTable } from "../drizzle/schema.js";
+import { passwordResetTokenTable, sessionsTable, shortLinkTable, usersTable, verifyEmailTokenTable } from "../drizzle/schema.js";
 import { and, eq, gte, lt, sql } from "drizzle-orm";
 import argon2 from "argon2";
 import jwt from "jsonwebtoken";
@@ -152,8 +152,6 @@ export const insertVerifyEmailTokenInDb = async ({ userId, token }) => {
 }
 
 export const createVerifyEmailLink = async ({email, token}) => {
-    // const uriEncodedEmail = encodeURIComponent(email);
-    // return `${process.env.FRONTEND_URL}/verify-email-token?token=${token}&email=${uriEncodedEmail}`;
     const url = new URL(`${process.env.FRONTEND_URL}/verify-email-token`);
     url.searchParams.append('token', token);
     url.searchParams.append('email', email);
@@ -215,4 +213,40 @@ export const sendNewVerifyEmail = async ({email, userId}) => {
 
 export const updateUsersTableInDB = async ({userId, name}) => {
     return await db.update(usersTable).set({name}).where(eq(usersTable.id, userId));
+}
+
+export const updatePassInDB = async ({userId, password}) => {
+    return await db.update(usersTable).set({password}).where(eq(usersTable.id, userId));
+}
+
+export const generateResetPassToken = () => {
+    return crypto.randomBytes(32).toString("hex");
+}
+
+export const hashingTokens = async (token) => {
+    return await argon2.hash(token);
+}
+
+export const insertResetTokenInDB = async ({token, userId}) => {
+    return db.insert(passwordResetTokenTable).values({tokenHash : token, userId: userId});
+}
+
+export const createVerifyResetPassEmailLink = async ({token}) => {
+    const url = new URL(`${process.env.FRONTEND_URL}/reset-password`);
+    url.searchParams.append('token', token);
+
+    return url.toString();
+}
+
+export const sendNewResetPasswordEmail = async ({email, userId}) => {
+    //generate token & hash it and later on store it in db
+    const token = generateResetPassToken();
+
+    const hashedToken = crypto.createHash("sha256").update(token).digest("hex");
+
+    await db.delete(passwordResetTokenTable).where(eq(passwordResetTokenTable.userId, userId));
+
+    await insertResetTokenInDB({token : hashedToken, userId: userId});
+
+    return await createVerifyResetPassEmailLink({ token });
 }

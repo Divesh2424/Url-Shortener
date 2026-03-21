@@ -18,9 +18,11 @@ import {
   verifyUserEmailAndUpdate,
   clearVerifyEmailTokens,
   sendNewVerifyEmail,
-  updateUsersTableInDB
+  updateUsersTableInDB,
+  updatePassInDB,
+  sendNewResetPasswordEmail
 } from "../services/auth.services.js";
-import { registrationSchema, loginUserSchema, verifyEmailSchema, nameSchema } from "../validators/auth-validators.js";
+import { registrationSchema, loginUserSchema, verifyEmailSchema, nameSchema, passwordSchema, verifyPasswordSchema, emailSchema } from "../validators/auth-validators.js";
 
 export const getLoginPage = (req, res) => {
    if(req.user) {
@@ -201,4 +203,67 @@ export const postUpdatedProfilePage = async (req, res) => {
     res.send("Error updating data");
   }
   return res.redirect("/me");
+}
+
+export const getChangePassPage = async (req, res) => {
+  return res.render("auth/change-pass", {
+    errors : req.flash("errors")
+  });
+}
+
+export const postUpdatedPassword = async (req, res) => {
+  const {data, error} = verifyPasswordSchema.safeParse(req.body);
+
+  if(error) {
+    const err = error.issues[0].message;
+    req.flash("errors", err);
+    return res.redirect("/change-password");
+  }
+
+  const {currentPassword, newPassword} = data;
+
+  const user = await fetchUserById(req.user.id);
+  if(!user) return res.status(404).send("User not found");
+
+  //currentpass ko match krna h 
+  const isCurrPassMatched = await comparePasswords(currentPassword, user.password);
+  
+  if(!isCurrPassMatched) {
+    req.flash("errors", {message: "Current Password don't match"});
+    return res.redirect("/change-password");
+  }
+
+  //if matched then hash new pass and then store it in db
+  const hashedNewPassword = await hashingPasswords(newPassword);
+
+  await updatePassInDB({userId: user.id, password: hashedNewPassword});
+
+  return res.redirect("/me");
+}
+
+export const getPageToEnterEmailForResetPass = async (req, res) => {
+  return res.render("auth/forgot-pass", {
+    formSubmitted: req.flash("formSubmitted")[0],
+    errors: req.flash("errors")
+  })
+}
+
+export const sendVerifyEmailForResetPass = async (req, res) => {
+  const {data, error} = emailSchema.safeParse(req.body);
+
+  if(error) {
+    const err = error.issues[0].message;
+    req.flash("errors", err);
+    return res.redirect("/reset-password");
+  }
+
+  const {email} = data;
+  
+  const user = await getUserByEmail(email);
+  
+  if(!user) return res.status(404).send("User not found!");
+
+  await sendNewResetPasswordEmail({email : email, userId : user.id});
+
+  return res.redirect("/reset-password");
 }

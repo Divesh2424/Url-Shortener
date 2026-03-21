@@ -43,6 +43,13 @@
       "when": 1773906146631,
       "tag": "0005_medical_secret_warriors",
       "breakpoints": true
+    },
+    {
+      "idx": 6,
+      "version": "5",
+      "when": 1773997948397,
+      "tag": "0006_rare_puff_adder",
+      "breakpoints": true
     }
   ]
 }
