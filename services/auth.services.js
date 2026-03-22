@@ -248,5 +248,18 @@ export const sendNewResetPasswordEmail = async ({email, userId}) => {
 
     await insertResetTokenInDB({token : hashedToken, userId: userId});
 
-    return await createVerifyResetPassEmailLink({ token });
+    const verifyEmailLink = await createVerifyResetPassEmailLink({ token });
+
+    const mjmlTemplate = await fs.readFile(path.join(import.meta.dirname, "..", "emails", "reset-password-email.mjml"), 'utf-8');
+
+    const filledTemplate = ejs.render(mjmlTemplate, {token: token, link : verifyEmailLink});
+
+      //to convert mjml to html
+      const htmlOutput = mjml2html(filledTemplate).html;
+
+      await sendEmail({
+        to : email,
+        subject : "Reset Your Password",
+        html : htmlOutput
+        }).catch(console.error);
 }

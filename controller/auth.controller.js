@@ -22,7 +22,7 @@ import {
   updatePassInDB,
   sendNewResetPasswordEmail
 } from "../services/auth.services.js";
-import { registrationSchema, loginUserSchema, verifyEmailSchema, nameSchema, passwordSchema, verifyPasswordSchema, emailSchema } from "../validators/auth-validators.js";
+import { registrationSchema, loginUserSchema, verifyEmailSchema, nameSchema, passwordSchema, verifyPasswordSchema, emailSchema, updateProfileSchema, resetPassEmailSchema } from "../validators/auth-validators.js";
 
 export const getLoginPage = (req, res) => {
    if(req.user) {
@@ -48,12 +48,13 @@ export const postLogin = async (req, res) => {
   }
 
   const {data, error} = loginUserSchema.safeParse(req.body);
-  
+
   if(error) {
     const err = error.issues[0].message;
     req.flash("errors", err);
     return res.redirect("/login");
   }
+
   const { email, password } = data;
 
   const user = await getUserByEmail(email);
@@ -163,7 +164,7 @@ export const verifyEmailToken = async (req, res) => {
   }
 
   const [token] = await findVerificationEmailToken(data);
- 
+
   if(!token) res.send("Verification link is invalid/expired");
 
   await verifyUserEmailAndUpdate(token.email);
@@ -185,7 +186,7 @@ export const getEditProfilePage = async (req, res) => {
 export const postUpdatedProfilePage = async (req, res) => {
     try {
        
-    const {data, error} = nameSchema.safeParse(req.body);
+    const {data, error} = updateProfileSchema.safeParse(req.body);
 
     if(error) {
       const err = error.issues[0].message;
@@ -249,7 +250,7 @@ export const getPageToEnterEmailForResetPass = async (req, res) => {
 }
 
 export const sendVerifyEmailForResetPass = async (req, res) => {
-  const {data, error} = emailSchema.safeParse(req.body);
+  const {data, error} = resetPassEmailSchema.safeParse(req.body);
 
   if(error) {
     const err = error.issues[0].message;
@@ -260,7 +261,6 @@ export const sendVerifyEmailForResetPass = async (req, res) => {
   const {email} = data;
   
   const user = await getUserByEmail(email);
-  
   if(!user) return res.status(404).send("User not found!");
 
   await sendNewResetPasswordEmail({email : email, userId : user.id});
