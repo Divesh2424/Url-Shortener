@@ -7,12 +7,8 @@ export const emailSchema =
         .email({message : "Please enter a valid email address"});
         
 export const resetPassEmailSchema = z.object({
-    email : z
-    .string()
-    .trim()
-    .email({message : "Please enter a valid email address"})
-})
-    
+    email : emailSchema
+});
 
 export const passwordSchema = 
         z

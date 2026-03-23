@@ -231,14 +231,7 @@ export const insertResetTokenInDB = async ({token, userId}) => {
     return db.insert(passwordResetTokenTable).values({tokenHash : token, userId: userId});
 }
 
-export const createVerifyResetPassEmailLink = async ({token}) => {
-    const url = new URL(`${process.env.FRONTEND_URL}/reset-password`);
-    url.searchParams.append('token', token);
-
-    return url.toString();
-}
-
-export const sendNewResetPasswordEmail = async ({email, userId}) => {
+export const createResetPasswordLink = async ({userId}) => {
     //generate token & hash it and later on store it in db
     const token = generateResetPassToken();
 
@@ -248,18 +241,5 @@ export const sendNewResetPasswordEmail = async ({email, userId}) => {
 
     await insertResetTokenInDB({token : hashedToken, userId: userId});
 
-    const verifyEmailLink = await createVerifyResetPassEmailLink({ token });
-
-    const mjmlTemplate = await fs.readFile(path.join(import.meta.dirname, "..", "emails", "reset-password-email.mjml"), 'utf-8');
-
-    const filledTemplate = ejs.render(mjmlTemplate, {token: token, link : verifyEmailLink});
-
-      //to convert mjml to html
-      const htmlOutput = mjml2html(filledTemplate).html;
-
-      await sendEmail({
-        to : email,
-        subject : "Reset Your Password",
-        html : htmlOutput
-        }).catch(console.error);
+    return `${process.env.FRONTEND_URL}/reset-password/${token}`;
 }

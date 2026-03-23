@@ -1,4 +1,4 @@
-import { sendEmail } from "../lib/nodemailer.js";
+import { sendEmail } from "../lib/send-email.js";
 import {
   getUserByEmail,
   saveData,
@@ -20,9 +20,10 @@ import {
   sendNewVerifyEmail,
   updateUsersTableInDB,
   updatePassInDB,
-  sendNewResetPasswordEmail
+  createResetPasswordLink
 } from "../services/auth.services.js";
 import { registrationSchema, loginUserSchema, verifyEmailSchema, nameSchema, passwordSchema, verifyPasswordSchema, emailSchema, updateProfileSchema, resetPassEmailSchema } from "../validators/auth-validators.js";
+import { getHTMLFromMjmlTemplate } from "../lib/get-html-from-mjml-template.js";
 
 export const getLoginPage = (req, res) => {
    if(req.user) {
@@ -263,7 +264,19 @@ export const sendVerifyEmailForResetPass = async (req, res) => {
   const user = await getUserByEmail(email);
   if(!user) return res.status(404).send("User not found!");
 
-  await sendNewResetPasswordEmail({email : email, userId : user.id});
+  const resetPasswordLink = await createResetPasswordLink({userId : user.id});
 
+  const html = await getHTMLFromMjmlTemplate("reset-password-email", {
+    name : user.name,
+    link : resetPasswordLink
+  });
+
+  await sendEmail({
+    to: user.email,
+    subject: "Reset Your Password",
+    html: html
+  });
+
+  req.flash("formSubmitted", true);
   return res.redirect("/reset-password");
 }
