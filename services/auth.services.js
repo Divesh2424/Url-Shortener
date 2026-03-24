@@ -243,3 +243,18 @@ export const createResetPasswordLink = async ({userId}) => {
 
     return `${process.env.FRONTEND_URL}/reset-password/${token}`;
 }
+
+export const getResetPasswordToken = async (token) => {
+    const hashedToken = crypto.createHash("sha256").update(token).digest("hex");
+
+    const [data] = await db.select().from(passwordResetTokenTable).where(
+        and(
+            eq(passwordResetTokenTable.tokenHash, hashedToken), 
+            gte(passwordResetTokenTable.expiresAt, sql`CURRENT_TIMESTAMP`))
+        )
+    return data;
+}
+
+export const clearResetPasswordToken = async (userId) => {
+    return await db.delete(passwordResetTokenTable).where(eq(passwordResetTokenTable.userId, userId));
+}

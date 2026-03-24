@@ -1,5 +1,5 @@
 import { Router } from "express";
-import { getLoginPage, getRegistrationPage, postLogin, postRegistrationPage, getProfilePage, logoutUser, getEmailVerificationPage, resendVerificationEmail, verifyEmailToken, getEditProfilePage, postUpdatedProfilePage, getChangePassPage, postUpdatedPassword, getPageToEnterEmailForResetPass, sendVerifyEmailForResetPass } from "../controller/auth.controller.js";
+import { getLoginPage, getRegistrationPage, postLogin, postRegistrationPage, getProfilePage, logoutUser, getEmailVerificationPage, resendVerificationEmail, verifyEmailToken, getEditProfilePage, postUpdatedProfilePage, getChangePassPage, postUpdatedPassword, getPageToEnterEmailForResetPass, sendVerifyEmailForResetPass, getResetPasswordPage, postResetPassword } from "../controller/auth.controller.js";
 
 const router = Router();
 
@@ -13,5 +13,6 @@ router.route("/verify-email-token").get(verifyEmailToken);
 router.route("/edit-profile").get(getEditProfilePage).post(postUpdatedProfilePage);
 router.route("/change-password").get(getChangePassPage).post(postUpdatedPassword);
 router.route("/reset-password").get(getPageToEnterEmailForResetPass).post(sendVerifyEmailForResetPass);
+router.route("/reset-password/:token").get(getResetPasswordPage).post(postResetPassword)
 
 export const authRoutes = router;

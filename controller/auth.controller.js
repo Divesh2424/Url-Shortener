@@ -20,9 +20,11 @@ import {
   sendNewVerifyEmail,
   updateUsersTableInDB,
   updatePassInDB,
-  createResetPasswordLink
+  createResetPasswordLink,
+  getResetPasswordToken,
+  clearResetPasswordToken
 } from "../services/auth.services.js";
-import { registrationSchema, loginUserSchema, verifyEmailSchema, nameSchema, passwordSchema, verifyPasswordSchema, emailSchema, updateProfileSchema, resetPassEmailSchema } from "../validators/auth-validators.js";
+import { registrationSchema, loginUserSchema, verifyEmailSchema, nameSchema, passwordSchema, verifyPasswordSchema, emailSchema, updateProfileSchema, resetPassEmailSchema, resetPasswordSchema } from "../validators/auth-validators.js";
 import { getHTMLFromMjmlTemplate } from "../lib/get-html-from-mjml-template.js";
 
 export const getLoginPage = (req, res) => {
@@ -279,4 +281,50 @@ export const sendVerifyEmailForResetPass = async (req, res) => {
 
   req.flash("formSubmitted", true);
   return res.redirect("/reset-password");
+}
+
+export const getResetPasswordPage = async (req, res) => {
+  // to get the token from url 
+  const {token} = req.params;
+
+  //verify the token with the token in db
+  const resetPasswordData = await getResetPasswordToken(token);
+  if(!resetPasswordData) res.render("auth/wrong-reset-password-token");
+
+  //if verified, redirect to page
+  return res.render("auth/reset-password", {
+    formSubmitted: req.flash("formSubmitted")[0],
+    errors: req.flash("errors"),
+    token
+  })
+}
+
+export const postResetPassword = async (req, res) => {
+  // to get the token from url 
+  const {token} = req.params;
+
+  //verify the token with the token in db
+  const resetPasswordData = await getResetPasswordToken(token);
+  if(!resetPasswordData) res.render("auth/wrong-reset-password-token");
+
+  const {data, error} = resetPasswordSchema.safeParse(req.body);
+
+  if(error) {
+    const err = error.issues[0].message;
+    req.flash("errors", err);
+    return res.redirect(`/reset-password/${token}`);
+  }
+
+  const {newPassword} = data;
+
+  const user = await fetchUserById(resetPasswordData.userId);
+
+  // delete previous tokens of the specific user
+  await clearResetPasswordToken(user.id);
+
+  const hashedPassword = await hashingPasswords(newPassword);
+
+  await updatePassInDB({userId: user.id, password: hashedPassword});
+
+  return res.redirect("/login");
 }

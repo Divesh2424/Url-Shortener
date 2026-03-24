@@ -47,10 +47,7 @@ export const verifyEmailSchema = z.object({
     email: emailSchema
 });
 
-export const verifyPasswordSchema = z.object({
-    currentPassword: z
-    .string()
-    .min(1, {message: "Current password is required!"}),
+export const resetPasswordSchema = z.object({
     newPassword: z
     .string()
     .min(6, {message : "New Password must be atleast 6 chars long!"})
@@ -62,4 +59,10 @@ export const verifyPasswordSchema = z.object({
 }).refine((data) => data.newPassword === data.confirmPassword, {
     message: "Password don't match",
     path: ["confirmPassword"]
+});
+
+export const verifyPasswordSchema = resetPasswordSchema.extend({
+    currentPassword: z
+    .string()
+    .min(1, {message: "Current password is required!"}),
 });
