@@ -1,4 +1,5 @@
-import { sendEmail } from "../lib/send-email.js";
+// import { sendEmail } from "../lib/send-email.js";
+import { sendEmail } from "../lib/gmail-smtp.js";
 import {
   getUserByEmail,
   saveData,

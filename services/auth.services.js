@@ -4,7 +4,7 @@ import { and, eq, gte, lt, sql } from "drizzle-orm";
 import argon2 from "argon2";
 import jwt from "jsonwebtoken";
 import crypto from "crypto";
-import { sendEmail } from "../lib/send-email.js";
+import { sendEmail } from "../lib/gmail-smtp.js";
 import fs from "fs/promises";
 import path from "path";
 import mjml2html from "mjml";
