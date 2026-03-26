@@ -402,6 +402,13 @@ input:focus{
     text-decoration: none;
     color: white;
     font-weight: bold;
+    transition: all 0.25s ease;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.12);
+}
+
+.btn:hover {
+    transform: translateY(-2px) scale(1.02);
+    box-shadow: 0 8px 20px rgba(0, 0, 0, 0.18);
 }
 
 .edit {
@@ -643,4 +650,66 @@ input:focus{
 .back {
     text-align: center;
     margin-top: 15px;
+}
+
+.google-btn {
+  display: block;
+  text-align: center;
+  padding: 12px;
+  border-radius: 8px;
+  background: white;
+  border: 1px solid #ddd;
+  text-decoration: none;
+  color: black;
+  font-weight: bold;
+  transition: 0.2s;
+}
+
+.google-btn:hover {
+  background: #f5f5f5;
+}
+
+.password-field {
+  position: relative;
+}
+
+.password-input {
+  width: 100%;
+  padding-right: 40px; 
+}
+
+.toggle-password {
+  position: absolute;
+  right: 12px;
+  top: 65%;
+  transform: translateY(-50%);
+  cursor: pointer;
+
+  transition: all 0.3s ease;
+}
+
+/* Hover effect */
+.toggle-password:hover {
+  transform: translateY(-50%) scale(1.15);
+}
+
+/* Active animation (click pe) */
+.toggle-password.active {
+  animation: eyeSlide 0.4s ease;
+}
+
+/* Keyframes */
+@keyframes eyeSlide {
+  0% {
+    transform: translateY(-50%) translateX(0) rotate(0deg);
+    opacity: 1;
+  }
+  50% {
+    transform: translateY(-50%) translateX(-8px) rotate(-20deg);
+    opacity: 0.5;
+  }
+  100% {
+    transform: translateY(-50%) translateX(0) rotate(0deg);
+    opacity: 1;
+  }
 }
