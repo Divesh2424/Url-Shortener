@@ -27,6 +27,8 @@ import {
 } from "../services/auth.services.js";
 import { registrationSchema, loginUserSchema, verifyEmailSchema, nameSchema, passwordSchema, verifyPasswordSchema, emailSchema, updateProfileSchema, resetPassEmailSchema, resetPasswordSchema } from "../validators/auth-validators.js";
 import { getHTMLFromMjmlTemplate } from "../lib/get-html-from-mjml-template.js";
+import { generateCodeVerifier, generateState, createAuthorizationURL } from "arctic";
+import { google } from "../lib/oauth/google.js";
 
 export const getLoginPage = (req, res) => {
    if(req.user) {
@@ -328,4 +330,27 @@ export const postResetPassword = async (req, res) => {
   await updatePassInDB({userId: user.id, password: hashedPassword});
 
   return res.redirect("/login");
+}
+
+export const getGoogleLoginPage = async (req, res) => {
+  if(req.user) return res.redirect("/");
+
+  const state = generateState();
+  const codeVerifier = generateCodeVerifier();
+
+  const url = google.createAuthorizationURL(state, codeVerifier, [
+    "openid",
+    "profile",
+    "email"
+  ]);
+
+  const cookieConfig = {
+    httpOnly: true,
+    secure: true,
+    maxAge: 10 * 60 * 1000, // 10 minutes
+    sameSite: "lax"
+  }
+
+  res.cookie("google_oauth_state", state, cookieConfig);
+  res.cookie("google_code_verifier", codeVerifier, cookieConfig);
 }

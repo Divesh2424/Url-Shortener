@@ -1,5 +1,5 @@
 import { relations, sql } from 'drizzle-orm';
-import { boolean, text, timestamp, int, mysqlTable, varchar } from 'drizzle-orm/mysql-core';
+import { boolean, text, timestamp, int, mysqlTable, varchar, mysqlEnum } from 'drizzle-orm/mysql-core';
 
 export const shortLinkTable = mysqlTable('short_link', {
   id: int().autoincrement().primaryKey(),
@@ -46,6 +46,13 @@ export const passwordResetTokenTable = mysqlTable('password_reset_tokens', {
   createdAt: timestamp('created_at').defaultNow().notNull()
 });
 
+export const oAuthAccountsTable = mysqlTable('oAuth_Accounts', {
+  id: int().autoincrement().primaryKey(),
+  userId: int('user_id').notNull().references(() => usersTable.id, {onDelete: "cascade"}),
+  provider: mysqlEnum("provider", ["google", "github"]).notNull(),
+  providerAccountId: varchar("provider_account_id", {length: 255}).notNull().unique(),
+  createdAt: timestamp("created_at").defaultNow().notNull()
+})
 
 export const usersRelation = relations(usersTable, ({many}) => ({
   shortLink : many(shortLinkTable),
