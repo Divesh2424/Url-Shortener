@@ -1,5 +1,5 @@
 import { db } from "../config/db.js";
-import { passwordResetTokenTable, sessionsTable, shortLinkTable, usersTable, verifyEmailTokenTable } from "../drizzle/schema.js";
+import { oAuthAccountsTable, passwordResetTokenTable, sessionsTable, shortLinkTable, usersTable, verifyEmailTokenTable } from "../drizzle/schema.js";
 import { and, eq, gte, lt, sql } from "drizzle-orm";
 import argon2 from "argon2";
 import jwt from "jsonwebtoken";
@@ -257,4 +257,36 @@ export const getResetPasswordToken = async (token) => {
 
 export const clearResetPasswordToken = async (userId) => {
     return await db.delete(passwordResetTokenTable).where(eq(passwordResetTokenTable.userId, userId));
+}
+
+export const getUserWithOauthId = async ({email, provider}) => {
+    const [user] = await db.select({
+        id: usersTable.id,
+        name: usersTable.name,
+        email: usersTable.email,
+        isEmailValid: usersTable.isEmailValid,
+        providerAccountId: oAuthAccountsTable.providerAccountId,
+        provider: oAuthAccountsTable.provider
+    }).from(usersTable).where(eq(usersTable.email, email)).leftJoin(oAuthAccountsTable,
+        and(
+            eq(oAuthAccountsTable.provider, provider),
+            eq(oAuthAccountsTable.userId, usersTable.id)
+        )
+    )
+    return user;
+}
+
+export const linkUserWithoAuth = async ({userId, provider, providerAccountId}) => {
+    await db.insert(oAuthAccountsTable).values({userId, provider, providerAccountId});
+}
+
+export const createUserWithoAuth = async ({name, email, provider, providerAccountId}) => {
+    const user = await db.transaction(async (trx) => {
+        const [user] = await trx.insert(usersTable).values({email, name, isEmailValid: true}).$returningId();
+        await trx.insert(oAuthAccountsTable).values({provider, providerAccountId, userId: user.id});
+        return {
+            id: user.id, name, email, isEmailValid: true, provider, providerAccountId
+        }
+    });
+    return user;
 }

@@ -23,11 +23,14 @@ import {
   updatePassInDB,
   createResetPasswordLink,
   getResetPasswordToken,
-  clearResetPasswordToken
+  clearResetPasswordToken,
+  getUserWithOauthId,
+  linkUserWithoAuth,
+  createUserWithoAuth
 } from "../services/auth.services.js";
 import { registrationSchema, loginUserSchema, verifyEmailSchema, nameSchema, passwordSchema, verifyPasswordSchema, emailSchema, updateProfileSchema, resetPassEmailSchema, resetPasswordSchema } from "../validators/auth-validators.js";
 import { getHTMLFromMjmlTemplate } from "../lib/get-html-from-mjml-template.js";
-import { generateCodeVerifier, generateState, createAuthorizationURL } from "arctic";
+import { decodeIdToken, generateCodeVerifier, generateState } from "arctic";
 import { google } from "../lib/oauth/google.js";
 
 export const getLoginPage = (req, res) => {
@@ -67,6 +70,10 @@ export const postLogin = async (req, res) => {
   if (!user) {
     req.flash("errors", "Invalid email/password")
     res.redirect("/login");
+  }
+  if(!user.password) {
+    req.flash("errors", "You have created account using social login. Please login with your social account!");
+    return res.redirect("/login");
   }
 
   const isPasswordValidate = await comparePasswords(password, user.password);
@@ -353,4 +360,54 @@ export const getGoogleLoginPage = async (req, res) => {
 
   res.cookie("google_oauth_state", state, cookieConfig);
   res.cookie("google_code_verifier", codeVerifier, cookieConfig);
+
+  res.redirect(url.toString());
+}
+
+export const getGoogleLoginCallback = async (req, res) => {
+  const {code, state} = req.query;
+
+  const {google_oauth_state: storedState, google_code_verifier: codeVerifier} = req.cookies;
+
+  if(!code || !state || !storedState || !codeVerifier || state !== storedState) {
+    req.flash("errors", "Could not login with google because of invalid login attempt. Please Try Again!");
+    return res.redirect("/login");
+  }
+
+  let tokens;
+  try {
+    tokens = await google.validateAuthorizationCode(code, codeVerifier);
+  } catch (error) {
+    req.flash("errors", "Could not login with google because of invalid login attempt. Please Try Again!");
+    return res.redirect("/login");
+  }
+
+  const claims = decodeIdToken(tokens.idToken());
+  const {sub: googleUserId, name, email} = claims;
+
+  //if user is already linked then we will get the user 
+  let user = await getUserWithOauthId({
+    provider: "google",
+    email
+  });
+
+  //if user exists but not linked with oAuth
+  if(user && !user.providerAccountId) {
+    await linkUserWithoAuth({
+      userId: user.id,
+      provider: "google",
+      providerAccountId: googleUserId
+    })
+  }
+
+  //if user doesn't exist
+  if(!user) {
+    user = await createUserWithoAuth({
+      name, email, provider: "google", providerAccountId: googleUserId
+    })
+  }
+
+  await authenticateFunc({req, res, user, name, email});
+
+  return res.redirect("/");
 }
