@@ -713,3 +713,9 @@ input:focus{
     opacity: 1;
   }
 }
+.github-btn {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+}

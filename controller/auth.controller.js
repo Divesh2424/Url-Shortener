@@ -32,6 +32,7 @@ import { registrationSchema, loginUserSchema, verifyEmailSchema, nameSchema, pas
 import { getHTMLFromMjmlTemplate } from "../lib/get-html-from-mjml-template.js";
 import { decodeIdToken, generateCodeVerifier, generateState } from "arctic";
 import { google } from "../lib/oauth/google.js";
+import { github } from "../lib/oauth/github.js";
 
 export const getLoginPage = (req, res) => {
    if(req.user) {
@@ -410,4 +411,28 @@ export const getGoogleLoginCallback = async (req, res) => {
   await authenticateFunc({req, res, user, name, email});
 
   return res.redirect("/");
+}
+
+export const getGithubLoginPage = async (req, res) => {
+  if(req.user) return res.redirect("/");
+
+  const state = generateState();
+
+  const url = github.createAuthorizationURL(state, codeVerifier, [
+    "openid",
+    "profile",
+    "email"
+  ]);
+
+  const cookieConfig = {
+    httpOnly: true,
+    secure: true,
+    maxAge: 10 * 60 * 1000, // 10 minutes
+    sameSite: "lax"
+  }
+
+  res.cookie("google_oauth_state", state, cookieConfig);
+  res.cookie("google_code_verifier", codeVerifier, cookieConfig);
+
+  res.redirect(url.toString());
 }
