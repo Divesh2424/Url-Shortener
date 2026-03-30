@@ -418,11 +418,7 @@ export const getGithubLoginPage = async (req, res) => {
 
   const state = generateState();
 
-  const url = github.createAuthorizationURL(state, codeVerifier, [
-    "openid",
-    "profile",
-    "email"
-  ]);
+  const url = github.createAuthorizationURL(state, ["user:email"]);
 
   const cookieConfig = {
     httpOnly: true,
@@ -431,8 +427,25 @@ export const getGithubLoginPage = async (req, res) => {
     sameSite: "lax"
   }
 
-  res.cookie("google_oauth_state", state, cookieConfig);
-  res.cookie("google_code_verifier", codeVerifier, cookieConfig);
+  res.cookie("github_oauth_state", state, cookieConfig);
 
   res.redirect(url.toString());
+}
+
+export const getGithubLoginCallback = async (req, res) => {
+  const {code, state} = req.query;
+  const {github_oauth_state: storedState} = req.cookies;
+
+  if(!code || !state || !storedState || state !== storedState) {
+    req.flash("errors", "Could not login with github because of invalid login attempt. Please Try Again!");
+    return res.redirect("/login");
+  }
+
+  let tokens;
+  try {
+    tokens = await github.validateAuthorizationCode(code);
+  } catch (error) {
+    req.flash("errors", "Could not login with github because of invalid login attempt. Please Try Again!");
+    return res.redirect("/login");
+  }
 }
