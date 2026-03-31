@@ -448,4 +448,63 @@ export const getGithubLoginCallback = async (req, res) => {
     req.flash("errors", "Could not login with github because of invalid login attempt. Please Try Again!");
     return res.redirect("/login");
   }
+
+  const githubUserResponse = await fetch("https://api.github.com/user", {
+    headers: {
+      Authorization: `Bearer ${tokens.accessToken()}`
+    }
+  })
+
+  if(!githubUserResponse.ok) {
+    req.flash("errors", "Could not login with github because of invalid login attempt. Please Try Again!");
+    return res.redirect("/login");
+  }
+
+  const githubUser = await githubUserResponse.json();
+  const {id: githubUserId, name} = githubUser;
+
+  const githubEmailResponse = await fetch("https://api.github.com/user/emails", {
+    headers: {
+      Authorization: `Bearer ${tokens.accessToken()}`
+    }
+  })
+
+  if(!githubEmailResponse.ok) {
+    req.flash("errors", "Could not login with github because of invalid login attempt. Please Try Again!");
+    return res.redirect("/login");
+  }
+
+  const githubEmail = await githubEmailResponse.json();
+  const email = githubEmail.filter((e) => e.primary)[0].email;
+
+  if(!email) {
+    req.flash("errors", "Could not login with github because of invalid login attempt. Please Try Again!");
+    return res.redirect("/login");
+  }
+
+   //if user is already linked then we will get the user 
+  let user = await getUserWithOauthId({
+    provider: "github",
+    email
+  });
+
+  //if user exists but not linked with oAuth
+  if(user && !user.providerAccountId) {
+    await linkUserWithoAuth({
+      userId: user.id,
+      provider: "github",
+      providerAccountId: githubUserId
+    })
+  }
+
+  //if user doesn't exist
+  if(!user) {
+    user = await createUserWithoAuth({
+      name, email, provider: "github", providerAccountId: githubUserId
+    })
+  }
+
+  await authenticateFunc({req, res, user, name, email});
+
+  return res.redirect("/");
 }
