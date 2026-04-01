@@ -1,5 +1,5 @@
 import { Router } from "express";
-import { getLoginPage, getRegistrationPage, postLogin, postRegistrationPage, getProfilePage, logoutUser, getEmailVerificationPage, resendVerificationEmail, verifyEmailToken, getEditProfilePage, postUpdatedProfilePage, getChangePassPage, postUpdatedPassword, getPageToEnterEmailForResetPass, sendVerifyEmailForResetPass, getResetPasswordPage, postResetPassword, getGoogleLoginPage, getGoogleLoginCallback, getGithubLoginPage, getGithubLoginCallback } from "../controller/auth.controller.js";
+import { getLoginPage, getRegistrationPage, postLogin, postRegistrationPage, getProfilePage, logoutUser, getEmailVerificationPage, resendVerificationEmail, verifyEmailToken, getEditProfilePage, postUpdatedProfilePage, getChangePassPage, postUpdatedPassword, getPageToEnterEmailForResetPass, sendVerifyEmailForResetPass, getResetPasswordPage, postResetPassword, getGoogleLoginPage, getGoogleLoginCallback, getGithubLoginPage, getGithubLoginCallback, getSetPasswordPage } from "../controller/auth.controller.js";
 
 const router = Router();
 
@@ -17,6 +17,7 @@ router.route("/google").get(getGoogleLoginPage);
 router.route("/google/callback").get(getGoogleLoginCallback);
 router.route("/github").get(getGithubLoginPage);
 router.route("/github/callback").get(getGithubLoginCallback);
+router.route("/set-password").get(getSetPasswordPage);
 router.route("/logout").get(logoutUser);
 
 export const authRoutes = router;

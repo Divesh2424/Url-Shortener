@@ -144,6 +144,7 @@ export const getProfilePage = async (req, res) => {
       name : user.name,
       email : user.email,
       isEmailValid : user.isEmailValid,
+      hasPassword: Boolean(user.password),
       createdAt : user.createdAt,
       links : userShortLinks
     }
@@ -507,4 +508,10 @@ export const getGithubLoginCallback = async (req, res) => {
   await authenticateFunc({req, res, user, name, email});
 
   return res.redirect("/");
+}
+
+export const getSetPasswordPage = async (req, res) => {
+  if(!user) return res.redirect("/login");
+
+  
 }
