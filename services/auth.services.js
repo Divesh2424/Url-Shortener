@@ -290,3 +290,7 @@ export const createUserWithoAuth = async ({name, email, provider, providerAccoun
     });
     return user;
 }
+
+export const insertPasswordInUserRecord = async ({userId, password}) => {
+    await db.update(usersTable).set({password}).where(eq(usersTable.id, userId));
+}

@@ -26,9 +26,10 @@ import {
   clearResetPasswordToken,
   getUserWithOauthId,
   linkUserWithoAuth,
-  createUserWithoAuth
+  createUserWithoAuth,
+  insertPasswordInUserRecord
 } from "../services/auth.services.js";
-import { registrationSchema, loginUserSchema, verifyEmailSchema, nameSchema, passwordSchema, verifyPasswordSchema, emailSchema, updateProfileSchema, resetPassEmailSchema, resetPasswordSchema } from "../validators/auth-validators.js";
+import { registrationSchema, loginUserSchema, verifyEmailSchema, nameSchema, passwordSchema, verifyPasswordSchema, emailSchema, updateProfileSchema, resetPassEmailSchema, resetPasswordSchema, setPasswordSchema } from "../validators/auth-validators.js";
 import { getHTMLFromMjmlTemplate } from "../lib/get-html-from-mjml-template.js";
 import { decodeIdToken, generateCodeVerifier, generateState } from "arctic";
 import { google } from "../lib/oauth/google.js";
@@ -511,7 +512,34 @@ export const getGithubLoginCallback = async (req, res) => {
 }
 
 export const getSetPasswordPage = async (req, res) => {
-  if(!user) return res.redirect("/login");
+  if(!req.user) return res.redirect("/");
 
-  
+  return res.render("auth/set-password", {
+    errors : req.flash("errors")
+  })
+}
+
+export const postSetPassword = async (req, res) => {
+  if(!req.user) return res.redirect("/");
+  //get pass from frontend & zod validation
+  const {data, error} = setPasswordSchema.safeParse(req.body);
+  if(error) {
+    const err = error.issues[0].message;
+    req.flash("errors", err);
+    return res.redirect("/set-password");
+  }
+
+  const {newPassword} = data;
+
+  const user = await fetchUserById(req.user.id);
+  if(user.password) {
+    req.flash("errors", "You already have your password, instead change your password");
+    return res.redirect("/set-password");
+  }
+
+  //hash pass and store it in db
+  const hashedPassword = await hashingPasswords(newPassword);
+  await insertPasswordInUserRecord({userId: user.id, password: hashedPassword});
+
+  return res.redirect("/me");
 }

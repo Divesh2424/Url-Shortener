@@ -66,3 +66,5 @@ export const verifyPasswordSchema = resetPasswordSchema.extend({
     .string()
     .min(1, {message: "Current password is required!"}),
 });
+
+export const setPasswordSchema = resetPasswordSchema;
