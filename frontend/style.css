@@ -347,12 +347,18 @@ input:focus{
     width: 70px;
     height: 70px;
     border-radius: 50%;
-    background: rgba(255,255,255,0.3);
+    overflow: hidden;
     display: flex;
     align-items: center;
     justify-content: center;
-    font-size: 30px;
-    margin-right: 20px;
+    margin: 0px 12px;
+}
+
+.avatar img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    display: block; 
 }
 
 .user-details h2 {

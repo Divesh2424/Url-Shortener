@@ -146,6 +146,7 @@ export const getProfilePage = async (req, res) => {
       email : user.email,
       isEmailValid : user.isEmailValid,
       hasPassword: Boolean(user.password),
+      avatarUrl: user.avatarUrl,
       createdAt : user.createdAt,
       links : userShortLinks
     }
@@ -386,7 +387,7 @@ export const getGoogleLoginCallback = async (req, res) => {
   }
 
   const claims = decodeIdToken(tokens.idToken());
-  const {sub: googleUserId, name, email} = claims;
+  const {sub: googleUserId, name, email, picture} = claims;
 
   //if user is already linked then we will get the user 
   let user = await getUserWithOauthId({
@@ -399,14 +400,15 @@ export const getGoogleLoginCallback = async (req, res) => {
     await linkUserWithoAuth({
       userId: user.id,
       provider: "google",
-      providerAccountId: googleUserId
+      providerAccountId: googleUserId,
+      avatarUrl: picture
     })
   }
 
   //if user doesn't exist
   if(!user) {
     user = await createUserWithoAuth({
-      name, email, provider: "google", providerAccountId: googleUserId
+      name, email, provider: "google", providerAccountId: googleUserId, avatarUrl: picture
     })
   }
 
@@ -463,7 +465,7 @@ export const getGithubLoginCallback = async (req, res) => {
   }
 
   const githubUser = await githubUserResponse.json();
-  const {id: githubUserId, name} = githubUser;
+  const {id: githubUserId, name, avatar_url} = githubUser;
 
   const githubEmailResponse = await fetch("https://api.github.com/user/emails", {
     headers: {
@@ -495,14 +497,15 @@ export const getGithubLoginCallback = async (req, res) => {
     await linkUserWithoAuth({
       userId: user.id,
       provider: "github",
-      providerAccountId: githubUserId
+      providerAccountId: githubUserId,
+      avatarUrl: avatar_url
     })
   }
 
   //if user doesn't exist
   if(!user) {
     user = await createUserWithoAuth({
-      name, email, provider: "github", providerAccountId: githubUserId
+      name: name || githubUser.login, email, provider: "github", providerAccountId: githubUserId, avatarUrl: avatar_url
     })
   }
 

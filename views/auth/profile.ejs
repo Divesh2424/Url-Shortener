@@ -16,7 +16,11 @@
     <!-- Top Card -->
     <div class="profile-header">
         <div class="avatar">
-            <%= user.name.charAt(0).toUpperCase() %>
+            <% if(user.avatarUrl) { %>
+                <img src="<%= user.avatarUrl %>" alt="">
+            <% } else { %>
+                <%= user.name.charAt(0).toUpperCase() %>
+           <% } %>
         </div>
 
         <div class="user-details">

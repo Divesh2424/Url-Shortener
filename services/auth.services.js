@@ -1,6 +1,6 @@
 import { db } from "../config/db.js";
 import { oAuthAccountsTable, passwordResetTokenTable, sessionsTable, shortLinkTable, usersTable, verifyEmailTokenTable } from "../drizzle/schema.js";
-import { and, eq, gte, lt, sql } from "drizzle-orm";
+import { and, eq, gte, isNull, lt, sql } from "drizzle-orm";
 import argon2 from "argon2";
 import jwt from "jsonwebtoken";
 import crypto from "crypto";
@@ -276,13 +276,16 @@ export const getUserWithOauthId = async ({email, provider}) => {
     return user;
 }
 
-export const linkUserWithoAuth = async ({userId, provider, providerAccountId}) => {
+export const linkUserWithoAuth = async ({userId, provider, providerAccountId, avatarUrl}) => {
     await db.insert(oAuthAccountsTable).values({userId, provider, providerAccountId});
+    if(avatarUrl) {
+        await db.update(usersTable).set({avatarUrl}).where(and(eq(usersTable.id, userId), isNull(usersTable.avatarUrl)));
+    }
 }
 
-export const createUserWithoAuth = async ({name, email, provider, providerAccountId}) => {
+export const createUserWithoAuth = async ({name, email, provider, providerAccountId, avatarUrl}) => {
     const user = await db.transaction(async (trx) => {
-        const [user] = await trx.insert(usersTable).values({email, name, isEmailValid: true}).$returningId();
+        const [user] = await trx.insert(usersTable).values({email, name, avatarUrl, isEmailValid: true}).$returningId();
         await trx.insert(oAuthAccountsTable).values({provider, providerAccountId, userId: user.id});
         return {
             id: user.id, name, email, isEmailValid: true, provider, providerAccountId
