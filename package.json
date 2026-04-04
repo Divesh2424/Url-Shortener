@@ -6,7 +6,8 @@
   "scripts": {
     "dev": "node --env-file=.env --watch ./backend/server.js",
     "start": "node ./backend/server.js",
-    "studio": "npx drizzle-kit studio"
+    "studio": "npx drizzle-kit studio",
+    "seed": "node --env-file=.env ./drizzle/seed.js"
   },
   "keywords": [],
   "author": "",
@@ -21,6 +22,7 @@
     "connect-flash": "^0.1.1",
     "cookie-parser": "^1.4.7",
     "drizzle-orm": "^0.45.1",
+    "drizzle-seed": "^0.3.1",
     "ejs": "^4.0.1",
     "express": "^5.2.1",
     "express-session": "^1.19.0",
