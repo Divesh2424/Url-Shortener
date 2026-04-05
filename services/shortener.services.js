@@ -2,9 +2,8 @@ import { db } from "../config/db.js";
 import { shortLinkTable } from "../drizzle/schema.js";
 import { eq } from "drizzle-orm";
 
-export const loadLinks = async (userId) => {
-    const allLinks = await db.select().from(shortLinkTable).where(eq(shortLinkTable.userId, userId));
-    return allLinks;
+export const loadLinks = async ({userId, limit=10, offset=0}) => {
+    return await db.select().from(shortLinkTable).where(eq(shortLinkTable.userId, userId)).limit(limit).offset(offset);
 }
 
 export const getLinkByShortCode = async (shortcode) => {

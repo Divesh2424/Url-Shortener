@@ -1,6 +1,6 @@
 import crypto from "crypto";
 import { loadLinks, saveLinks, getLinkByShortCode, findLinkById, updateUrlById, deleteUrlById } from "../services/shortener.services.js";
-import { urlSchema } from "../validators/url-validators.js";
+import { shortnerSearchParamSchema, urlSchema } from "../validators/url-validators.js";
 import { fetchUserById } from "../services/auth.services.js";
 
 export const postUrlShortener = async (req, res) => {
@@ -40,8 +40,15 @@ export const getShortnerPage = async (req, res) => {
   try {
     if(!req.user) return res.redirect("/login");
 
-    
-    const links = await loadLinks(req.user.id);
+    const searchParams = shortnerSearchParamSchema.parse(req.query);
+    // const links = await loadLinks(req.user.id);
+
+    const {shortLinks, totalCount} = await loadLinks({
+      userId: req.user.id,
+      limit: 10,
+      offset: (searchParams.page - 1) * 10
+    });
+
     const user = await fetchUserById(req.user.id);
 
     return res.render("index", {

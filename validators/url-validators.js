@@ -10,3 +10,14 @@ export const urlSchema = z.object({
     .max(20, {message : "Short URL too long"})
     .optional()
 });
+
+export const shortnerSearchParamSchema = z.object({
+    page: z.coerce
+        .number()
+        .int()
+        .positive()
+        .min(1)
+        .optional()
+        .default(1)
+        .catch(1)
+})
