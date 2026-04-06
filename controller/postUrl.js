@@ -49,11 +49,15 @@ export const getShortnerPage = async (req, res) => {
       offset: (searchParams.page - 1) * 10
     });
 
+    const totalPages = Math.ceil(totalCount/10);
+
     const user = await fetchUserById(req.user.id);
 
     return res.render("index", {
-      links,
+      links: shortLinks,
       host: req.headers.host,
+      currentPage: searchParams.page,
+      totalPages: totalPages,
       errors : req.flash("errors"),
       userId : user.id,
       name : user.name

@@ -60,7 +60,7 @@
       <% links.forEach((item) => { %>
 
         <li class="link-item">
-
+          <div class="info">
           <div class="short-link">
             <a href="/<%= item.shortCode %>" target="_blank">
               <%= host %>/<%= item.shortCode %>
@@ -68,6 +68,7 @@
           </div>
           <div class="original-link">
             -> <%= item.url %>
+          </div>
           </div>
           
           <div class="edit-link">
@@ -84,6 +85,19 @@
 
     </ul>
 
+  </div>
+
+  <div class="pagination-in-links">
+    <% if(totalPages > 1) { %>
+      <% if(currentPage > 1) { %>
+        <a href="?page=<%= currentPage - 1 %>"><button class="page-btn">Previous</button></a>
+      <% } %>
+      <button><%=currentPage%></button>
+
+      <% if(currentPage < totalPages) { %>
+        <a href="?page=<%= currentPage + 1 %>"><button class="page-btn">Next</button></a>
+      <% } %>
+    <% } %>
   </div>
 
 </div>
