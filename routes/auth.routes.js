@@ -1,4 +1,6 @@
 import { Router } from "express";
+import multer from "multer";
+import path from "path";
 import { getLoginPage, getRegistrationPage, postLogin, postRegistrationPage, getProfilePage, logoutUser, getEmailVerificationPage, resendVerificationEmail, verifyEmailToken, getEditProfilePage, postUpdatedProfilePage, getChangePassPage, postUpdatedPassword, getPageToEnterEmailForResetPass, sendVerifyEmailForResetPass, getResetPasswordPage, postResetPassword, getGoogleLoginPage, getGoogleLoginCallback, getGithubLoginPage, getGithubLoginCallback, getSetPasswordPage, postSetPassword } from "../controller/auth.controller.js";
 
 const router = Router();
@@ -9,7 +11,33 @@ router.route("/me").get(getProfilePage);
 router.route("/verify-email").get(getEmailVerificationPage);
 router.route("/resend-verification-email").get(resendVerificationEmail)
 router.route("/verify-email-token").get(verifyEmailToken);
-router.route("/edit-profile").get(getEditProfilePage).post(postUpdatedProfilePage);
+
+const avatarStorage = multer.diskStorage({
+    destination: (req, file, cb) => {
+        cb(null, "frontend/uploads/avatars");
+    },
+    filename: (req, file, cb) => {
+        const ext = path.extname(file.originalname);
+        cb(null, `${Date.now()}_${Math.floor(10000000 + Math.random() * 90000000)}${ext}`);
+    }
+});
+
+const avatarFileFilter = (req, file, cb) => {
+    if(file.mimetype.startsWith("image/")) {
+        cb(null, true);
+    } else {
+        cb(new Error("Only image files are allowed!"), false);
+    }
+}
+
+const avatarUpload = multer({
+    storage: avatarStorage,
+    fileFilter: avatarFileFilter,
+    limits: {fileSize: 5*1024*1024} //5mb
+})
+
+router.route("/edit-profile").get(getEditProfilePage).post(avatarUpload.single('avatar'), postUpdatedProfilePage);
+
 router.route("/change-password").get(getChangePassPage).post(postUpdatedPassword);
 router.route("/reset-password").get(getPageToEnterEmailForResetPass).post(sendVerifyEmailForResetPass);
 router.route("/reset-password/:token").get(getResetPasswordPage).post(postResetPassword)

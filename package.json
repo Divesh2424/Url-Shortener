@@ -14,6 +14,7 @@
   "license": "ISC",
   "type": "module",
   "dependencies": {
+    "@google/generative-ai": "^0.24.1",
     "@prisma/client": "^6.3.1",
     "arctic": "^3.7.0",
     "argon2": "^0.44.0",
@@ -30,8 +31,10 @@
     "mjml": "^4.18.0",
     "mongodb": "^7.1.0",
     "mongoose": "^9.2.3",
+    "multer": "^2.1.1",
     "mysql2": "^3.19.1",
     "nodemailer": "^8.0.2",
+    "openai": "^6.33.0",
     "request-ip": "^3.3.0",
     "resend": "^6.9.4",
     "zod": "^4.3.6"

@@ -196,6 +196,7 @@ export const getEditProfilePage = async (req, res) => {
 
   return res.render("auth/edit-profile", {
     name : user.name,
+    avatarUrl: user.avatarUrl,
     errors : req.flash("errors")
   });
 }
@@ -213,7 +214,9 @@ export const postUpdatedProfilePage = async (req, res) => {
 
     const user = await fetchUserById(req.user.id);
 
-    await updateUsersTableInDB({userId: user.id, name : data.name});
+    const fileUrl = req.file ? `uploads/avatars/${req.file.filename}`: undefined;
+    
+    await updateUsersTableInDB({userId: user.id, name : data.name, avatarUrl: fileUrl});
 
     return res.redirect("/me");
   } catch (error) {

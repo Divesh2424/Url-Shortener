@@ -211,8 +211,8 @@ export const sendNewVerifyEmail = async ({email, userId}) => {
 }
 
 
-export const updateUsersTableInDB = async ({userId, name}) => {
-    return await db.update(usersTable).set({name}).where(eq(usersTable.id, userId));
+export const updateUsersTableInDB = async ({userId, name, avatarUrl}) => {
+    return await db.update(usersTable).set({name, avatarUrl}).where(eq(usersTable.id, userId));
 }
 
 export const updatePassInDB = async ({userId, password}) => {

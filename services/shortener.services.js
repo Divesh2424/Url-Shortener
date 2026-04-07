@@ -16,8 +16,8 @@ export const getLinkByShortCode = async (shortcode) => {
     return shortLink;
 }
 
-export const saveLinks = async ({url, shortCode, userId}) => {
-    const newShortLink = await db.insert(shortLinkTable).values({url, shortCode, userId});
+export const saveLinks = async ({url, shortCode, userId, summary}) => {
+    const newShortLink = await db.insert(shortLinkTable).values({url, shortCode, userId, summary});
     return newShortLink;
 }
 

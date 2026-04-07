@@ -5,6 +5,7 @@ export const shortLinkTable = mysqlTable('short_link', {
   id: int().autoincrement().primaryKey(),
   url: varchar({ length: 255 }).notNull(),
   shortCode: varchar("short_code", { length: 25 }).notNull().unique(),
+  summary: text('summary'),
   createdAt: timestamp("created_at").defaultNow().notNull(),
   updatedAt: timestamp("updated_at").defaultNow().onUpdateNow().notNull(),
   userId: int("user_id").notNull().references(() => usersTable.id, {onDelete : "cascade"}),

@@ -2,6 +2,10 @@ import crypto from "crypto";
 import { loadLinks, saveLinks, getLinkByShortCode, findLinkById, updateUrlById, deleteUrlById } from "../services/shortener.services.js";
 import { shortnerSearchParamSchema, urlSchema } from "../validators/url-validators.js";
 import { fetchUserById } from "../services/auth.services.js";
+import { generateUrlSummary } from "../services/ai-services.js";
+import { shortLinkTable } from "../drizzle/schema.js";
+import { db } from "../config/db.js";
+import { eq } from "drizzle-orm";
 
 export const postUrlShortener = async (req, res) => {
   try {
@@ -19,15 +23,17 @@ export const postUrlShortener = async (req, res) => {
 
     const finalShortUrl = shorturl || crypto.randomBytes(5).toString("hex");
 
-     // check if shortcode already exists
+    // check if shortcode already exists
     const existingLink = await getLinkByShortCode(finalShortUrl);
-
+    
     if (existingLink) {
       req.flash("errors", "Shortcode already exists. Please choose another!")
       return res.redirect("/");
     }
-   
-    await saveLinks({url : enterurl, shortCode : finalShortUrl, userId : req.user.id})
+
+    const summary = await generateUrlSummary(enterurl);
+    
+    await saveLinks({url : enterurl, shortCode : finalShortUrl, userId : req.user.id, summary})
 
     return res.redirect("/");
   } catch (error) {
