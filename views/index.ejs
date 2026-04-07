@@ -91,11 +91,44 @@
     <% if(totalPages > 1) { %>
       <% if(currentPage > 1) { %>
         <a href="?page=<%= currentPage - 1 %>"><button class="page-btn">Previous</button></a>
+      <% } else { %>
+          <button class="page-btn disabled" disabled>Previous</button>
       <% } %>
-      <button><%=currentPage%></button>
+
+
+     <% 
+     let startPage = Math.max(1, currentPage - 2);
+     let endPage = Math.min(totalPages, currentPage + 2); 
+     %>
+
+     <%# Always show first page %>
+     <% if(startPage>1) { %>
+      <a href="?page=1"><button>1</button></a>
+      <% if(startPage>2) { %>
+        <button>...</button>
+      <% } %>
+    <% } %>
+
+     <% for(let i = startPage; i<= endPage; i++) { %>
+      <% if(i === currentPage) { %>
+        <button class="active"><%= i %></button>
+      <% } else { %>
+        <a href="?page=<%= i %>"><button><%= i %></button></a>
+      <% } %>
+     <% } %>
+
+      <%# Always show last page %>
+     <% if(endPage<totalPages) { %>
+      <% if(endPage<totalPages-1) { %>
+        <button>...</button>
+      <% } %>
+      <a href="?page=<%=totalPages%>"><button><%=totalPages%></button></a>
+    <% } %>
 
       <% if(currentPage < totalPages) { %>
         <a href="?page=<%= currentPage + 1 %>"><button class="page-btn">Next</button></a>
+      <% } else { %>
+        <button class="page-btn disabled" disabled>Next</button>
       <% } %>
     <% } %>
   </div>

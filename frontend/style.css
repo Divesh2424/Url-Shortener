@@ -769,8 +769,15 @@ input:focus{
   box-shadow: 0 4px 10px rgba(0,0,0,0.15);
 }
 
-/* Active (current page) */
+
 .pagination-in-links button:not(.page-btn) {
+  color: black;
+  cursor: default;
+  box-shadow: 0 4px 12px rgba(0,0,0,0.2);
+}
+
+/* Active (current page) */
+.pagination-in-links .active{
   background: linear-gradient(135deg, #4f8cff, #6f73ff);
   color: white;
   cursor: default;
@@ -780,4 +787,20 @@ input:focus{
 /* Remove link underline */
 .pagination-in-links a {
   text-decoration: none;
+}
+
+.page-btn.disabled {
+  background: #e0e0e0;
+  color: #999;
+  cursor: not-allowed;
+  box-shadow: none;
+  transform: none;
+}
+
+/* Hover effect disable */
+.page-btn.disabled:hover {
+  background: #e0e0e0;
+  color: #999;
+  transform: none;
+  box-shadow: none;
 }
