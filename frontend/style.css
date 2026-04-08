@@ -216,13 +216,28 @@ input:focus{
 .original-link{
   font-size:14px;
   color:gray;
+  width: 70%;
 }
 
 .url-summary{
   font-size: 13px;
   margin-top: 4px;
   color: #e06666;
-  width: 80%;
+  width: 70%;
+}
+
+.skeleton {
+  width: 200px;
+  height: 12px;
+  background: #eee;
+  border-radius: 6px;
+  animation: pulse 1.5s infinite;
+}
+
+@keyframes pulse {
+  0% { opacity: 0.5; }
+  50% { opacity: 1; }
+  100% { opacity: 0.5; }
 }
 
 /* STATUS */
@@ -899,3 +914,4 @@ input:focus{
   border-color: #4f8cff;
   box-shadow: 0 4px 15px rgba(79, 140, 255, 0.3);
 }
+

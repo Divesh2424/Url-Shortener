@@ -2,6 +2,9 @@ import { Router } from "express";
 import multer from "multer";
 import path from "path";
 import { getLoginPage, getRegistrationPage, postLogin, postRegistrationPage, getProfilePage, logoutUser, getEmailVerificationPage, resendVerificationEmail, verifyEmailToken, getEditProfilePage, postUpdatedProfilePage, getChangePassPage, postUpdatedPassword, getPageToEnterEmailForResetPass, sendVerifyEmailForResetPass, getResetPasswordPage, postResetPassword, getGoogleLoginPage, getGoogleLoginCallback, getGithubLoginPage, getGithubLoginCallback, getSetPasswordPage, postSetPassword } from "../controller/auth.controller.js";
+import { db } from "../config/db.js";
+import { shortLinkTable } from "../drizzle/schema.js";
+import { eq } from "drizzle-orm";
 
 const router = Router();
 
@@ -46,6 +49,14 @@ router.route("/google/callback").get(getGoogleLoginCallback);
 router.route("/github").get(getGithubLoginPage);
 router.route("/github/callback").get(getGithubLoginCallback);
 router.route("/set-password").get(getSetPasswordPage).post(postSetPassword);
+router.get("/summary/:id", async (req, res) => {
+  const link = await db
+    .select()
+    .from(shortLinkTable)
+    .where(eq(shortLinkTable.id, req.params.id));
+
+  res.json({ summary: link[0].summary });
+});
 router.route("/logout").get(logoutUser);
 
 export const authRoutes = router;

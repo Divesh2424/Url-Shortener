@@ -31,9 +31,15 @@ export const postUrlShortener = async (req, res) => {
       return res.redirect("/");
     }
 
-    const summary = await generateUrlSummary(enterurl);
+    // const summary = await generateUrlSummary(enterurl);
+    generateUrlSummary(enterurl).then(async (summary) => {
+    await db
+      .update(shortLinkTable)
+      .set({ summary })
+      .where(eq(shortLinkTable.shortCode, finalShortUrl));
+    });
     
-    await saveLinks({url : enterurl, shortCode : finalShortUrl, userId : req.user.id, summary})
+    await saveLinks({url : enterurl, shortCode : finalShortUrl, userId : req.user.id})
 
     return res.redirect("/");
   } catch (error) {

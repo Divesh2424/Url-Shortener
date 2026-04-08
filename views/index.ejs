@@ -69,7 +69,15 @@
           <div class="original-link">
             -> <%= item.url %>
           </div>
-          <p class="url-summary"><%= item.summary %></p>
+        
+          <p class="url-summary" id="summary-<%= item.id %>">
+            <% if(!item.summary) { %>
+              <span class="skeleton">Generating Response....</span>
+            <% } else { %>
+              <%= item.summary %>
+            <% } %>
+          </p>
+
           </div>
           
           <div class="edit-link">
@@ -135,6 +143,22 @@
   </div>
 
 </div>
+<script>
+const links = document.querySelectorAll("[id^='summary-']");
 
+links.forEach((el) => {
+  const id = el.id.split("-")[1];
+
+  const interval = setInterval(async () => {
+    const res = await fetch(`/summary/${id}`);
+    const data = await res.json();
+
+    if (data.summary) {
+      el.innerHTML = data.summary;
+      clearInterval(interval); // stop polling
+    }
+  }, 2000); // every 2 sec
+});
+</script>
 </body>
 </html>
