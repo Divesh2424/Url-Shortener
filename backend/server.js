@@ -29,9 +29,10 @@ app.use((req, res, next) => {
 app.use(authRoutes);
 app.use(shortenerUrls);
 
+const PORT = process.env.PORT || 3002;
 try {
-  app.listen(env.PORT, () => {
-    console.log("🔥 Listening on port :", env.PORT);
+  app.listen(PORT, "0.0.0.0", () => {
+    console.log("🔥 Listening on port :", PORT);
   });
 } catch (error) {
     console.error(error);
