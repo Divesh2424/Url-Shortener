@@ -352,11 +352,11 @@ export const getGoogleLoginPage = async (req, res) => {
   const state = generateState();
   const codeVerifier = generateCodeVerifier();
 
-  const url = google.createAuthorizationURL(state, codeVerifier, [
-    "openid",
-    "profile",
-    "email"
-  ]);
+  const url = google.createAuthorizationURL(
+    state, 
+    codeVerifier, 
+    ["openid", "profile", "email"]
+  );
 
   const cookieConfig = {
     httpOnly: true,
